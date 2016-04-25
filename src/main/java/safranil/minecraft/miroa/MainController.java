@@ -1,5 +1,6 @@
 package safranil.minecraft.miroa;
 
+import fr.theshark34.openauth.AuthenticationException;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -40,8 +41,31 @@ public class MainController {
 
             @Override
             public Void call() {
+                Platform.runLater(() -> {
+                    playButton.setDisable(true);
+                    optionsButton.setDisable(true);
+                    loginField.setDisable(true);
+                    passwordField.setDisable(true);
+                    progress.setVisible(true);
+                });
+
+                MiroaLauncher launcher = MiroaLauncher.getInstance();
+
+                try {
+                    launcher.auth(loginField.getText(), passwordField.getText());
+                } catch (AuthenticationException e) {
+                    e.printStackTrace();
+                }
 
                 Platform.runLater(() -> {
+                    playButton.setDisable(false);
+                    optionsButton.setDisable(false);
+                    loginField.setDisable(true);
+                    passwordField.setDisable(true);
+                    progress.setVisible(false);
+                });
+
+                /*Platform.runLater(() -> {
                     playButton.setDisable(true);
                     playButton.setText("Mise à jour...");
                     progress.setVisible(true);
@@ -60,7 +84,9 @@ public class MainController {
                 Platform.runLater(() -> {
                     playButton.setText("Jouer");
                     playButton.setDisable(false);
-                });
+                });*/
+
+
                 return null;
             }
         });

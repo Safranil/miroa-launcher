@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("main.fxml"));
+        FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         GridPane root = loader.load();
         primaryStage.setTitle("Miroa");
         primaryStage.setScene(new Scene(root, 720, 440));
