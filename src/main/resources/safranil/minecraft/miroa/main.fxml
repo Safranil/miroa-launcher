@@ -43,7 +43,7 @@
                <children>
                   <TextField id="1" fx:id="loginField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
                   <PasswordField id="2" fx:id="passwordField" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Button id="3" fx:id="playButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playAction" text="Jouer" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <Button id="3" fx:id="playButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playAction" text="Connexion" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                   <Button id="4" fx:id="optionsButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#optionAction" text="Options" GridPane.columnIndex="2" />
                   <Label alignment="CENTER_RIGHT" text="Pseudo / Email : " GridPane.halignment="RIGHT" />
                   <Label alignment="CENTER_RIGHT" text="Mot de passe : " GridPane.halignment="RIGHT" GridPane.rowIndex="1" />

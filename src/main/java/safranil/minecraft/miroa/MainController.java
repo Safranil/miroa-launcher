@@ -1,12 +1,11 @@
 package safranil.minecraft.miroa;
 
+import com.sun.javafx.application.PlatformImpl;
 import fr.theshark34.openauth.AuthenticationException;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,70 +21,62 @@ import java.io.IOException;
 
 public class MainController {
     @FXML
-    public TextField loginField;
+    TextField loginField;
     @FXML
-    public PasswordField passwordField;
+    PasswordField passwordField;
     @FXML
-    public Button optionsButton;
+    Button optionsButton;
     @FXML
-    public Button playButton;
+    Button playButton;
     @FXML
-    public WebView webPreview;
+    WebView webPreview;
     @FXML
-    public ProgressIndicator progress;
+    ProgressIndicator progress;
+
+    public void setToPlay() {
+        playButton.setText("Jouer");
+        loginField.setDisable(true);
+        passwordField.setDisable(true);
+    }
+
+    public void setToLogin() {
+        playButton.setText("Connexion");
+        loginField.setDisable(false);
+        passwordField.setDisable(false);
+    }
 
     @FXML
     public void playAction(ActionEvent event) {
         Thread t = new Thread(new Task<Void>() {
-            int i;
-
             @Override
             public Void call() {
-                Platform.runLater(() -> {
-                    playButton.setDisable(true);
-                    optionsButton.setDisable(true);
-                    loginField.setDisable(true);
-                    passwordField.setDisable(true);
-                    progress.setVisible(true);
-                });
+                // Display login form
+                if (!MiroaLauncher.getInstance().isLoggedIn()) {
+                    PlatformImpl.runAndWait(() -> {
+                        playButton.setDisable(true);
+                        optionsButton.setDisable(true);
+                        loginField.setDisable(true);
+                        passwordField.setDisable(true);
+                        progress.setVisible(true);
+                    });
 
-                MiroaLauncher launcher = MiroaLauncher.getInstance();
-
-                try {
-                    launcher.auth(loginField.getText(), passwordField.getText());
-                } catch (AuthenticationException e) {
-                    e.printStackTrace();
-                }
-
-                Platform.runLater(() -> {
-                    playButton.setDisable(false);
-                    optionsButton.setDisable(false);
-                    loginField.setDisable(true);
-                    passwordField.setDisable(true);
-                    progress.setVisible(false);
-                });
-
-                /*Platform.runLater(() -> {
-                    playButton.setDisable(true);
-                    playButton.setText("Mise à jour...");
-                    progress.setVisible(true);
-                });
-
-                for (i = 0; i <= 100; i++) {
-                    Platform.runLater(() -> progress.setProgress(i / 100.0));
+                    MiroaLauncher launcher = MiroaLauncher.getInstance();
 
                     try {
-                        Thread.sleep(250);
-                    } catch (InterruptedException e) {
+                        launcher.auth(loginField.getText(), passwordField.getText());
+                    } catch (AuthenticationException e) {
                         e.printStackTrace();
                     }
+
+                    PlatformImpl.runAndWait(() -> {
+                        setToPlay();
+                        playButton.setDisable(false);
+                        optionsButton.setDisable(false);
+                        progress.setVisible(false);
+                    });
+                } else {
+
                 }
-
-                Platform.runLater(() -> {
-                    playButton.setText("Jouer");
-                    playButton.setDisable(false);
-                });*/
-
 
                 return null;
             }
@@ -96,15 +87,19 @@ public class MainController {
 
     @FXML
     public void optionAction(ActionEvent event) {
-        try{
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("option.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("option.fxml"));
+            Parent root = (Parent) loader.load();
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initOwner(Main.mainScene.getWindow());
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setTitle("Options");
-            stage.setScene(new Scene(root1));
+            stage.setScene(new Scene(root));
             stage.show();
+
+            OptionController controller = loader.getController();
+            controller.prepareOptions();
         } catch (IOException e) {
             e.printStackTrace();
         }

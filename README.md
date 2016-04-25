@@ -4,4 +4,5 @@ Miroa Launcher
 Dependencies
 ------------
 
- * OpenLauncherLib : https://github.com/Litarvan/OpenAuth
+ * OpenAuth : https://github.com/Litarvan/OpenAuth
+ * OpenLauncherLib : https://github.com/Litarvan/OpenLauncherLib
