@@ -37,10 +37,10 @@ public class OptionController {
     public void saveAction(ActionEvent event) {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
 
-        launcher.setMemory(memoryChoice.getValue().getJavaOption());
-
         if (launcher.checkJavaBin(javaField.getText())) {
             launcher.setJavaBin(javaField.getText());
+            launcher.setMemory(memoryChoice.getValue().getJavaOption());
+
             closeAction(event);
         }
         else {
@@ -66,7 +66,7 @@ public class OptionController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chemin vers l'exécutable Java");
 
-        if (System.getProperty("os.name").contains("Windows")) {
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
             fileChooser.setInitialDirectory(new File("C:\\Program Files"));
         }
 
