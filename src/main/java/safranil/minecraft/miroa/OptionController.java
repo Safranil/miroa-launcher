@@ -35,12 +35,22 @@ public class OptionController {
 
     @FXML
     public void saveAction(ActionEvent event) {
-        boolean error = false;
         MiroaLauncher launcher = MiroaLauncher.getInstance();
 
         launcher.setMemory(memoryChoice.getValue().getJavaOption());
 
-        closeAction(event);
+        if (launcher.checkJavaBin(javaField.getText())) {
+            launcher.setJavaBin(javaField.getText());
+            closeAction(event);
+        }
+        else {
+            Alert error = new Alert(Alert.AlertType.ERROR);
+            error.setTitle("Erreur chemin vers Java");
+            error.setHeaderText("L'exécutable Java spécifié est introuvable ou n'est pas exécutable.");
+            error.setContentText("Vérifiez que vous avez spécifier le bon chemin de Java, par exemple :\n" +
+                    "C:\\Program Files\\Java\\jre1.8.0_92\\bin\\java.exe");
+            error.showAndWait();
+        }
     }
 
     @FXML
@@ -55,6 +65,11 @@ public class OptionController {
     public void selectJavaAction(ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chemin vers l'exécutable Java");
+
+        if (System.getProperty("os.name").contains("Windows")) {
+            fileChooser.setInitialDirectory(new File("C:\\Program Files"));
+        }
+
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Exécutable Java", "java.exe", "java"),
                 new FileChooser.ExtensionFilter("Tout les fichiers", "*")
@@ -65,12 +80,12 @@ public class OptionController {
         }
     }
 
-    public void prepareOptions() {
+    void prepareOptions() {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
 
         memoryChoice.setItems(FXCollections.observableArrayList(MiroaLauncher.memoryOptions));
 
-        for (MemoryOption memory : launcher.memoryOptions) {
+        for (MemoryOption memory : MiroaLauncher.memoryOptions) {
             if (memory.getJavaOption().equals(launcher.getMemory())) {
                 memoryChoice.setValue(memory);
                 break;
@@ -78,7 +93,7 @@ public class OptionController {
         }
 
         if (memoryChoice.getValue() == null) {
-            memoryChoice.setValue(launcher.memoryOptions.get(launcher.DEFAULT_MEMORY_ID));
+            memoryChoice.setValue(MiroaLauncher.memoryOptions.get(MiroaLauncher.DEFAULT_MEMORY_ID));
         }
 
         if (launcher.isLoggedIn()) {
@@ -86,5 +101,7 @@ public class OptionController {
         } else {
             logoutButton.setVisible(false);
         }
+
+        javaField.setText(launcher.getJavaBin());
     }
 }

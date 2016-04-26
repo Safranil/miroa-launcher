@@ -8,10 +8,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -64,12 +61,23 @@ public class MainController {
 
                     try {
                         launcher.auth(loginField.getText(), passwordField.getText());
+                        PlatformImpl.runAndWait(() -> {
+                            setToPlay();
+                        });
                     } catch (AuthenticationException e) {
                         e.printStackTrace();
+
+                        PlatformImpl.runAndWait(() -> {
+                            Alert error = new Alert(Alert.AlertType.ERROR);
+                            error.setTitle("Erreur lors de l'authentification");
+                            error.setHeaderText("Erreur lors de l'authentification.");
+                            error.setContentText(String.format("ErrorMessage : %s\nError : %s", e.getErrorModel().getErrorMessage(), e.getErrorModel().getError()));
+                            error.showAndWait();
+                            setToLogin();
+                        });
                     }
 
                     PlatformImpl.runAndWait(() -> {
-                        setToPlay();
                         playButton.setDisable(false);
                         optionsButton.setDisable(false);
                         progress.setVisible(false);

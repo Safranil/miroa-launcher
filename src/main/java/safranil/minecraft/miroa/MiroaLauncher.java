@@ -17,7 +17,7 @@ public class MiroaLauncher {
     private static final String CLIENT_TOKEN = "MiroaLauncher";
     public static final String DEFAULT_MEMORY = "2048M";
     public static final int DEFAULT_MEMORY_ID = 4;
-    public static String DEFAULT_JAVA = JavaUtil.getJavaCommand();
+    public static String DEFAULT_JAVA = getDefaultJava();
 
     static MiroaLauncher self;
     MainController mainController;
@@ -130,7 +130,7 @@ public class MiroaLauncher {
 
     public String getJavaBin() {
         String java = saver.get("java");
-        if (checkJavaBin(java)) {
+        if (java != null && !"".equals(java) && checkJavaBin(java)) {
             return java;
         } else {
             return DEFAULT_JAVA;
@@ -149,5 +149,16 @@ public class MiroaLauncher {
     public boolean checkJavaBin(String java) {
         File file = new File(java);
         return file.exists() && file.canExecute();
+    }
+
+    private static String getDefaultJava() {
+        String java = JavaUtil.getJavaCommand();
+        if (java.startsWith("\"")) {
+            java = java.substring(1);
+        }
+        if (java.endsWith("\"")) {
+            java = java.substring(0, java.length()-1);
+        }
+        return java;
     }
 }

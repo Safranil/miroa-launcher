@@ -29,8 +29,6 @@ public class Main extends Application {
         launcher.setMainController(controller);
 
         controller.webPreview.getEngine().load("http://minecraft.safranil.fr/");
-
-        String username = launcher.getUsername();
         controller.setToLogin();
 
         try {
@@ -40,6 +38,8 @@ public class Main extends Application {
         } catch (AuthenticationException e) {
             e.printStackTrace();
         }
+
+        String username = launcher.getUsername();
         if (username != null) {
             controller.loginField.setText(username);
         }
