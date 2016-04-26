@@ -8,7 +8,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import sk.tomsik68.mclauncher.impl.common.Platform;
 
 
 public class Main extends Application {
@@ -23,9 +22,7 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 720, 440));
         primaryStage.show();
         primaryStage.setMinHeight(primaryStage.getHeight());
-        primaryStage.setOnCloseRequest(event -> {
-            System.exit(0);
-        });
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
         primaryStage.setMinWidth(primaryStage.getWidth());
 
         mainScene = primaryStage.getScene();
