@@ -70,3 +70,4 @@ buildNumber.properties
 
 ### Project specific
 launcher.properties
+!libs/*.jar
