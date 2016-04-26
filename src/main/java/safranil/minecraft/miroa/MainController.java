@@ -9,12 +9,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
 import sk.tomsik68.mclauncher.api.versions.IVersion;
+import sk.tomsik68.mclauncher.api.versions.IVersionInstaller;
 import sk.tomsik68.mclauncher.impl.versions.mcdownload.MCDownloadVersionList;
 
 import java.io.IOException;
@@ -37,6 +39,11 @@ public class MainController {
     @FXML
     ProgressIndicator progress;
 
+    @FXML
+    GridPane loginPane;
+    @FXML
+    GridPane infoPane;
+
     public void setToPlay() {
         playButton.setText("Jouer");
         loginField.setDisable(true);
@@ -51,6 +58,7 @@ public class MainController {
 
     @FXML
     public void playAction(ActionEvent event) {
+        MainController _this = this;
         Thread t = new Thread(new Task<Void>() {
             @Override
             public Void call() {
@@ -62,6 +70,8 @@ public class MainController {
                         loginField.setDisable(true);
                         passwordField.setDisable(true);
                         progress.setVisible(true);
+                        loginPane.setOpacity(0.25);
+                        infoPane.setVisible(true);
                         progress.setStyle(" -fx-progress-color: limegreen;");
                         infoLabel.setText("Connexion en cours...");
                     });
@@ -91,6 +101,8 @@ public class MainController {
                         optionsButton.setDisable(false);
                         progress.setVisible(false);
                         infoLabel.setText("");
+                        loginPane.setOpacity(1);
+                        infoPane.setVisible(false);
                     });
                 } else {
                     PlatformImpl.runAndWait(() -> {
@@ -101,6 +113,8 @@ public class MainController {
                         progress.setVisible(true);
                         progress.setStyle(" -fx-progress-color: limegreen;");
                         infoLabel.setText("Installation de Minecraft...");
+                        loginPane.setOpacity(0.25);
+                        infoPane.setVisible(true);
                     });
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
@@ -109,6 +123,8 @@ public class MainController {
                     MCDownloadVersionList mcd = new MCDownloadVersionList();
                     try {
                         mcd.startDownload();
+                        IVersion version = mcd.retrieveVersionInfo("1.7.10");
+                        version.getInstaller().install(version, mc, new InstallProgressMonitor(_this));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -119,6 +135,8 @@ public class MainController {
                         progress.setVisible(false);
                         infoLabel.setText("");
                         subInfoLabel.setText("");
+                        loginPane.setOpacity(1);
+                        infoPane.setVisible(false);
                     });
                 }
 
