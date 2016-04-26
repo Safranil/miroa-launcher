@@ -13,6 +13,9 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
+import sk.tomsik68.mclauncher.api.versions.IVersion;
+import sk.tomsik68.mclauncher.impl.versions.mcdownload.MCDownloadVersionList;
 
 import java.io.IOException;
 
@@ -21,6 +24,10 @@ public class MainController {
     TextField loginField;
     @FXML
     PasswordField passwordField;
+    @FXML
+    Label infoLabel;
+    @FXML
+    Label subInfoLabel;
     @FXML
     Button optionsButton;
     @FXML
@@ -55,6 +62,8 @@ public class MainController {
                         loginField.setDisable(true);
                         passwordField.setDisable(true);
                         progress.setVisible(true);
+                        progress.setStyle(" -fx-progress-color: limegreen;");
+                        infoLabel.setText("Connexion en cours...");
                     });
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
@@ -81,9 +90,36 @@ public class MainController {
                         playButton.setDisable(false);
                         optionsButton.setDisable(false);
                         progress.setVisible(false);
+                        infoLabel.setText("");
                     });
                 } else {
+                    PlatformImpl.runAndWait(() -> {
+                        playButton.setDisable(true);
+                        optionsButton.setDisable(true);
+                        loginField.setDisable(true);
+                        passwordField.setDisable(true);
+                        progress.setVisible(true);
+                        progress.setStyle(" -fx-progress-color: limegreen;");
+                        infoLabel.setText("Installation de Minecraft...");
+                    });
 
+                    MiroaLauncher launcher = MiroaLauncher.getInstance();
+
+                    MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
+                    MCDownloadVersionList mcd = new MCDownloadVersionList();
+                    try {
+                        mcd.startDownload();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    PlatformImpl.runAndWait(() -> {
+                        playButton.setDisable(false);
+                        optionsButton.setDisable(false);
+                        progress.setVisible(false);
+                        infoLabel.setText("");
+                        subInfoLabel.setText("");
+                    });
                 }
 
                 return null;

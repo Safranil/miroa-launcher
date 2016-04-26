@@ -42,6 +42,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/libs/openauth-1.0.0-SNAPSHOT.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>fr.theshark34</groupId>
+            <artifactId>openlauncherlib</artifactId>
+            <version>3.0.2-BETA</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/libs/openlauncherlib-3.0.2-BETA.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
