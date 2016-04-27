@@ -112,6 +112,7 @@ public class MainController {
                         passwordField.setDisable(true);
                         progress.setVisible(true);
                         progress.setStyle(" -fx-progress-color: limegreen;");
+                        progress.setProgress(-1);
                         infoLabel.setText("Installation de Minecraft...");
                         loginPane.setOpacity(0.25);
                         infoPane.setVisible(true);
@@ -119,12 +120,11 @@ public class MainController {
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
 
-                    MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
                     MCDownloadVersionList mcd = new MCDownloadVersionList();
                     try {
                         mcd.startDownload();
                         IVersion version = mcd.retrieveVersionInfo("1.7.10");
-                        version.getInstaller().install(version, mc, new InstallProgressMonitor(_this));
+                        version.getInstaller().install(version, launcher.mc, new InstallProgressMonitor(_this));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

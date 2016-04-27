@@ -8,6 +8,8 @@ class InstallProgressMonitor implements IProgressMonitor {
     private double max;
     private MainController controller;
 
+    private boolean canUpdateGUI = true;
+
     InstallProgressMonitor(MainController controller) {
         this.controller = controller;
     }
@@ -16,10 +18,7 @@ class InstallProgressMonitor implements IProgressMonitor {
     @Override
     public void setProgress(int i) {
         progress = i;
-        if (max > 0)
-            PlatformImpl.runLater(() -> {
-                controller.progress.setProgress(progress / max);
-            });
+        updateGUI();
     }
 
     @Override
@@ -30,10 +29,7 @@ class InstallProgressMonitor implements IProgressMonitor {
     @Override
     public void incrementProgress(int i) {
         progress++;
-        if (max > 0)
-            PlatformImpl.runLater(() -> {
-                controller.progress.setProgress(progress / max);
-            });
+        updateGUI();
     }
 
     @Override
@@ -41,6 +37,16 @@ class InstallProgressMonitor implements IProgressMonitor {
         PlatformImpl.runLater(() -> {
             controller.subInfoLabel.setText(s);
         });
+    }
+
+    private void updateGUI() {
+        if (max > 0 && (canUpdateGUI || progress == max)) {
+            canUpdateGUI = false;
+            PlatformImpl.runLater(() -> {
+                controller.progress.setProgress(progress / max);
+                canUpdateGUI = true;
+            });
+        }
     }
 }
 

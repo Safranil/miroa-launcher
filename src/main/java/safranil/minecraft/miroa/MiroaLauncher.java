@@ -6,6 +6,7 @@ import fr.theshark34.openauth.Authenticator;
 import fr.theshark34.openauth.model.AuthAgent;
 import fr.theshark34.openauth.model.response.AuthResponse;
 import fr.theshark34.openauth.model.response.RefreshResponse;
+import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
 import sk.tomsik68.mclauncher.impl.common.Platform;
 
 import java.io.File;
@@ -27,6 +28,8 @@ public class MiroaLauncher {
     Authenticator authenticator = new Authenticator(Authenticator.MOJANG_AUTH_URL, AuthPoints.NORMAL_AUTH_POINTS);
 
     private String accessToken;
+
+    MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
 
     /**
      * Make class as Singleton

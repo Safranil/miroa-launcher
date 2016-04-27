@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.control.*?>
@@ -67,8 +68,14 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Label fx:id="infoLabel" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER" />
-                        <Label fx:id="subInfoLabel" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER" />
+                        <Label fx:id="infoLabel" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" GridPane.vgrow="NEVER">
+                           <effect>
+                              <DropShadow blurType="GAUSSIAN" color="WHITE" height="20.0" radius="9.5" spread="0.9" width="20.0" />
+                           </effect></Label>
+                        <Label fx:id="subInfoLabel" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+                           <effect>
+                              <DropShadow blurType="GAUSSIAN" color="WHITE" height="20.0" radius="9.5" spread="0.9" width="20.0" />
+                           </effect></Label>
                      </children>
                   </GridPane>
                </children>
