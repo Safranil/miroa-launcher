@@ -8,6 +8,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import sk.tomsik68.mclauncher.api.login.ISession;
+import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
 
 
 public class Main extends Application {
@@ -56,17 +58,14 @@ public class Main extends Application {
         controller.webPreview.getEngine().load("http://minecraft.safranil.fr/");
         controller.setToLogin();
 
-        try {
-            if (launcher.refreshToken()) {
-                controller.setToPlay();
-            }
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
+        if (launcher.login()) {
+            controller.setToPlay();
         }
-
-        String username = launcher.getUsername();
-        if (username != null) {
-            controller.loginField.setText(username);
+        else {
+            String username = launcher.getUsername();
+            if (username != null) {
+                controller.loginField.setText(username);
+            }
         }
     }
 
