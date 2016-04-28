@@ -12,6 +12,8 @@ import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
 import sk.tomsik68.mclauncher.api.login.ISession;
 import sk.tomsik68.mclauncher.backend.GlobalAuthenticationSystem;
 import sk.tomsik68.mclauncher.impl.common.Platform;
+import sk.tomsik68.mclauncher.impl.login.legacy.LegacyLoginService;
+import sk.tomsik68.mclauncher.impl.login.legacy.LegacyProfile;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDLoginService;
 
 import java.io.File;
@@ -37,7 +39,6 @@ public class MiroaLauncher {
     private String accessToken;
 
     MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
-    YDLoginService loginService = new YDLoginService();
 
     private static MiroaLauncher self = new MiroaLauncher();
 
@@ -105,6 +106,14 @@ public class MiroaLauncher {
             e.printStackTrace();
             return false;
         }
+
+        return true;
+    }
+
+    public boolean login(String username, String password) throws Exception {
+        //LegacyLoginService loginService = new LegacyLoginService();
+        YDLoginService loginService = new YDLoginService();
+        ISession session = loginService.login(new LegacyProfile(username, password));
 
         return true;
     }

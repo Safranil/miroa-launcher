@@ -81,18 +81,18 @@ public class MainController {
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
 
                     try {
-                        launcher.auth(loginField.getText(), passwordField.getText());
+                        launcher.login(loginField.getText(), passwordField.getText());
                         PlatformImpl.runAndWait(() -> {
                             setToPlay();
                         });
-                    } catch (AuthenticationException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
 
                         PlatformImpl.runAndWait(() -> {
                             Alert error = new Alert(Alert.AlertType.ERROR);
                             error.setTitle("Erreur lors de l'authentification");
                             error.setHeaderText("Erreur lors de l'authentification.");
-                            error.setContentText(String.format("ErrorMessage : %s\nError : %s", e.getErrorModel().getErrorMessage(), e.getErrorModel().getError()));
+                            error.setContentText(String.format("ErrorMessage : %s", e.getMessage()));
                             error.showAndWait();
                             setToLogin();
                         });
