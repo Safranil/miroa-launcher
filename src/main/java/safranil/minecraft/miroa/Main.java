@@ -8,8 +8,15 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
 import sk.tomsik68.mclauncher.api.login.ISession;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
+
+import java.io.File;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class Main extends Application {
@@ -31,6 +38,13 @@ public class Main extends Application {
 
         MainController controller = loader.getController();
         MiroaLauncher launcher = MiroaLauncher.getInstance();
+
+        // Enable logging from API
+        /*MCLauncherAPI.log.setLevel(Level.ALL);
+        Handler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        MCLauncherAPI.log.addHandler(consoleHandler);*/
+
         launcher.setMainController(controller);
 
         if (MiroaLauncher.LAUNCHER_FOLDER.isFile()) {
@@ -61,11 +75,10 @@ public class Main extends Application {
         if (launcher.login()) {
             controller.setToPlay();
         }
-        else {
-            String username = launcher.getUsername();
-            if (username != null) {
-                controller.loginField.setText(username);
-            }
+
+        String username = launcher.getUsername();
+        if (username != null) {
+            controller.loginField.setText(username);
         }
     }
 

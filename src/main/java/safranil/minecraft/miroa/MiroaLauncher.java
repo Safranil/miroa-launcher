@@ -1,22 +1,19 @@
 package safranil.minecraft.miroa;
 
-import fr.theshark34.openauth.AuthPoints;
-import fr.theshark34.openauth.AuthenticationException;
-import fr.theshark34.openauth.Authenticator;
-import fr.theshark34.openauth.model.AuthAgent;
-import fr.theshark34.openauth.model.response.AuthResponse;
-import fr.theshark34.openauth.model.response.RefreshResponse;
 import safranil.minecraft.mclauncherapi.OperatingSystemOverwritter;
 import sk.tomsik68.mclauncher.api.common.IOperatingSystem;
 import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
+import sk.tomsik68.mclauncher.api.login.IProfile;
 import sk.tomsik68.mclauncher.api.login.ISession;
 import sk.tomsik68.mclauncher.backend.GlobalAuthenticationSystem;
 import sk.tomsik68.mclauncher.impl.common.Platform;
-import sk.tomsik68.mclauncher.impl.login.legacy.LegacyLoginService;
 import sk.tomsik68.mclauncher.impl.login.legacy.LegacyProfile;
+import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDLoginService;
+import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDProfileIO;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class MiroaLauncher {
@@ -24,7 +21,6 @@ public class MiroaLauncher {
 
     public static final String DEFAULT_MEMORY = "2048M";
     public static final int DEFAULT_MEMORY_ID = 4;
-    private static final String CLIENT_TOKEN = "MiroaLauncher";
 
     public static final String DEFAULT_JAVA = getDefaultJava();
     public static final File LAUNCHER_FOLDER = OS.getWorkingDirectory();
@@ -34,10 +30,9 @@ public class MiroaLauncher {
     static ArrayList<MemoryOption> memoryOptions = new ArrayList<>();
 
     private OptionSaver optionSaver = new OptionSaver(new File(LAUNCHER_FOLDER.getPath() + "/launcher.properties"));
-    Authenticator authenticator = new Authenticator(Authenticator.MOJANG_AUTH_URL, AuthPoints.NORMAL_AUTH_POINTS);
-
-    private String accessToken;
-
+    private IProfile[] profiles = {};
+    private ISession session;
+    private boolean loggedIn = false;
     MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
 
     private static MiroaLauncher self = new MiroaLauncher();
@@ -73,67 +68,65 @@ public class MiroaLauncher {
         this.mainController = mainController;
     }
 
-    public void auth(String username, String password) throws AuthenticationException {
-        optionSaver.set("username", username);
-
-        AuthResponse response = authenticator.authenticate(AuthAgent.MINECRAFT, username, password, CLIENT_TOKEN);
-        accessToken = response.getAccessToken();
-        optionSaver.set("accessToken", accessToken);
-    }
-
-    public boolean refreshToken() throws AuthenticationException {
-        String token = optionSaver.get("accessToken");
-
-        if (token == null || "".equals(token)) {
-            return false;
-        }
-
-        RefreshResponse response = authenticator.refresh(token, CLIENT_TOKEN);
-        accessToken = response.getAccessToken();
-        optionSaver.set("accessToken", accessToken);
-
-        return true;
-    }
-
     public boolean login() {
         try {
-            String[] authProfileNames = GlobalAuthenticationSystem.getProfileNames();
-            if (authProfileNames.length == 0) {
+            YDLoginService loginService = new YDLoginService();
+            YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
+            profiles = io.read();
+
+            if (profiles.length > 0) {
+                loginService.load(Platform.getCurrentPlatform().getWorkingDirectory());
+                loginService.login(profiles[0]);
+            }
+            else {
                 return false;
             }
-            ISession loginSession = GlobalAuthenticationSystem.login(authProfileNames[0]);
+
+            io.write(profiles);
+
+            loggedIn = true;
+            return true;
+        } catch (FileNotFoundException e) {
+            System.out.println("Profile file does not exist.");
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
         }
 
-        return true;
+        return false;
     }
 
     public boolean login(String username, String password) throws Exception {
-        //LegacyLoginService loginService = new LegacyLoginService();
         YDLoginService loginService = new YDLoginService();
-        ISession session = loginService.login(new LegacyProfile(username, password));
+        session = loginService.login(new LegacyProfile(username, password));
+        YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
 
+        profiles = new IProfile[]{new YDAuthProfile(username, session.getUsername(), session.getSessionID(), session.getUUID(), session.getUUID())};
+
+        io.write(profiles);
+        loginService.save(Platform.getCurrentPlatform().getWorkingDirectory());
+        io.write(profiles);
+
+        loggedIn = true;
         return true;
     }
 
-    public void logout() {
-        try {
-            authenticator.invalidate(accessToken, CLIENT_TOKEN);
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        }
-        accessToken = null;
-        optionSaver.remove("accessToken");
+    public void logout() throws Exception {
+        YDLoginService loginService = new YDLoginService();
+        YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
+        loginService.logout(session);
+        io.write(profiles);
+        loggedIn = false;
     }
 
     public boolean isLoggedIn() {
-        return accessToken != null;
+        return loggedIn;
     }
 
     public String getUsername() {
-        return optionSaver.get("username");
+        if (profiles.length > 0) {
+            return profiles[0].getName();
+        }
+        return "";
     }
 
 

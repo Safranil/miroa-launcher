@@ -56,7 +56,11 @@ public class OptionController {
     @FXML
     public void logoutAction(ActionEvent event) {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
-        launcher.logout();
+        try {
+            launcher.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         launcher.mainController.setToLogin();
         logoutButton.setDisable(true);
     }
