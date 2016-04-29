@@ -16,6 +16,11 @@
             <url>file://${project.basedir}/libs</url>
         </repository>
         <repository>
+            <id>dsol-xml</id>
+            <name>Simulation @ TU Delft</name>
+            <url>http://simulation.tudelft.nl/maven/</url>
+        </repository>
+        <repository>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
@@ -40,6 +45,11 @@
             <groupId>sk.tomsik68</groupId>
             <artifactId>mclauncher-api</artifactId>
             <version>0.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.akathist.maven.plugins.launch4j</groupId>
+            <artifactId>launch4j-maven-plugin</artifactId>
+            <version>1.7.10</version>
         </dependency>
     </dependencies>
     <build>

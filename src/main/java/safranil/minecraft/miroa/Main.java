@@ -8,8 +8,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+@SuppressWarnings("WeakerAccess")
 public class Main extends Application {
     static Scene mainScene;
+    static Stage mainStage;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -17,13 +19,14 @@ public class Main extends Application {
         GridPane root = loader.load();
         primaryStage.setTitle("Miroa");
         //primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
-        primaryStage.setScene(new Scene(root, 720, 440));
+        primaryStage.setScene(new Scene(root, 750, 450));
         primaryStage.show();
         primaryStage.setMinHeight(primaryStage.getHeight());
         primaryStage.setOnCloseRequest(event -> System.exit(0));
         primaryStage.setMinWidth(primaryStage.getWidth());
 
         mainScene = primaryStage.getScene();
+        mainStage = primaryStage;
 
         MainController controller = loader.getController();
         MiroaLauncher launcher = MiroaLauncher.getInstance();
@@ -36,23 +39,23 @@ public class Main extends Application {
 
         launcher.setMainController(controller);
 
-        if (MiroaLauncher.LAUNCHER_FOLDER.isFile()) {
-            MiroaLauncher.LAUNCHER_FOLDER.delete();
+        if (MiroaLauncher.OS.getWorkingDirectory().isFile()) {
+            MiroaLauncher.OS.getWorkingDirectory().delete();
         }
 
-        if (!MiroaLauncher.LAUNCHER_FOLDER.exists()) {
-            MiroaLauncher.LAUNCHER_FOLDER.mkdir();
+        if (!MiroaLauncher.OS.getWorkingDirectory().exists()) {
+            MiroaLauncher.OS.getWorkingDirectory().mkdir();
         }
 
-        if (!MiroaLauncher.LAUNCHER_FOLDER.canRead() || !MiroaLauncher.LAUNCHER_FOLDER.canWrite() || !MiroaLauncher.LAUNCHER_FOLDER.isDirectory()) {
+        if (!MiroaLauncher.OS.getWorkingDirectory().canRead() || !MiroaLauncher.OS.getWorkingDirectory().canWrite() || !MiroaLauncher.OS.getWorkingDirectory().isDirectory()) {
             Alert error = new Alert(Alert.AlertType.ERROR);
             error.setTitle("Dossier du jeu en erreur");
             error.setHeaderText("Le dossier contenant le jeu n'est pas accessible.");
             error.setContentText(String.format(
                     "canRead : %s\ncanWrite : %s\nisDirectory : %s",
-                    MiroaLauncher.LAUNCHER_FOLDER.canRead(),
-                    MiroaLauncher.LAUNCHER_FOLDER.canWrite(),
-                    MiroaLauncher.LAUNCHER_FOLDER.isDirectory()
+                    MiroaLauncher.OS.getWorkingDirectory().canRead(),
+                    MiroaLauncher.OS.getWorkingDirectory().canWrite(),
+                    MiroaLauncher.OS.getWorkingDirectory().isDirectory()
             ));
             error.showAndWait();
             PlatformImpl.exit();

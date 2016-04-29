@@ -2,7 +2,6 @@ package safranil.minecraft.miroa;
 
 import com.sun.javafx.application.PlatformImpl;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -54,7 +53,7 @@ public class MainController {
     }
 
     @FXML
-    public void playAction(ActionEvent event) {
+    public void playAction() {
         MainController _this = this;
         Thread t = new Thread(new Task<Void>() {
             @Override
@@ -77,9 +76,7 @@ public class MainController {
 
                     try {
                         launcher.login(loginField.getText(), passwordField.getText());
-                        PlatformImpl.runAndWait(() -> {
-                            setToPlay();
-                        });
+                        PlatformImpl.runAndWait(() -> setToPlay());
                     } catch (Exception e) {
                         e.printStackTrace();
 
@@ -121,13 +118,21 @@ public class MainController {
                     try {
                         launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(_this));
                         ProcessBuilder pb = launcherBackend.launchMinecraft(launcher.session, MiroaLauncher.MC_VERSION);
+
+                        PlatformImpl.runLater(() -> Main.mainStage.hide());
+
                         Process p = pb.start();
-                        p.waitFor();
+
+                        int returnValue = p.waitFor();
+                        if (returnValue == 0) {
+                            PlatformImpl.exit();
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
                     PlatformImpl.runAndWait(() -> {
+                        Main.mainStage.show();
                         playButton.setDisable(false);
                         optionsButton.setDisable(false);
                         progress.setVisible(false);
@@ -146,10 +151,10 @@ public class MainController {
     }
 
     @FXML
-    public void optionAction(ActionEvent event) {
+    public void optionAction() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("option.fxml"));
-            Parent root = (Parent) loader.load();
+            Parent root = loader.load();
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.initOwner(Main.mainScene.getWindow());

@@ -2,10 +2,8 @@ package safranil.minecraft.miroa;
 
 import safranil.minecraft.mclauncherapi.OperatingSystemOverwritter;
 import sk.tomsik68.mclauncher.api.common.IOperatingSystem;
-import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
 import sk.tomsik68.mclauncher.api.login.IProfile;
 import sk.tomsik68.mclauncher.api.login.ISession;
-import sk.tomsik68.mclauncher.backend.GlobalAuthenticationSystem;
 import sk.tomsik68.mclauncher.impl.common.Platform;
 import sk.tomsik68.mclauncher.impl.login.legacy.LegacyProfile;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
@@ -16,27 +14,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
-public class MiroaLauncher {
-    private static IOperatingSystem OS = new OperatingSystemOverwritter(Platform.getCurrentPlatform());
+class MiroaLauncher {
+    static final IOperatingSystem OS = new OperatingSystemOverwritter(Platform.getCurrentPlatform());
 
-    public static final String DEFAULT_MEMORY = "2048M";
-    public static final int DEFAULT_MEMORY_ID = 4;
-    public static final String MC_VERSION = "1.7.10";
+    private static final String DEFAULT_MEMORY = "2048M";
+    static final int DEFAULT_MEMORY_ID = 4;
+    static final String MC_VERSION = "1.7.10";
 
-    public static final String DEFAULT_JAVA = getDefaultJava();
-    public static final File LAUNCHER_FOLDER = OS.getWorkingDirectory();
+    private static final String DEFAULT_JAVA = getDefaultJava();
 
     MainController mainController;
 
-    static ArrayList<MemoryOption> memoryOptions = new ArrayList<>();
+    static final ArrayList<MemoryOption> memoryOptions = new ArrayList<>();
 
-    private OptionSaver optionSaver = new OptionSaver(new File(LAUNCHER_FOLDER.getPath() + "/launcher.properties"));
+    private final OptionSaver optionSaver = new OptionSaver(new File(OS.getWorkingDirectory() + "launcher.properties"));
     private IProfile[] profiles = {};
     ISession session;
     private boolean loggedIn = false;
-    MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
 
-    private static MiroaLauncher self = new MiroaLauncher();
+    private static final MiroaLauncher self = new MiroaLauncher();
 
     /**
      * Make class as Singleton
@@ -65,11 +61,11 @@ public class MiroaLauncher {
         return self;
     }
 
-    public void setMainController(MainController mainController) {
+    void setMainController(MainController mainController) {
         this.mainController = mainController;
     }
 
-    public boolean login() {
+    boolean login() {
         try {
             YDLoginService loginService = new YDLoginService();
             YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
@@ -96,7 +92,8 @@ public class MiroaLauncher {
         return false;
     }
 
-    public boolean login(String username, String password) throws Exception {
+    @SuppressWarnings("SameReturnValue")
+    boolean login(String username, String password) throws Exception {
         YDLoginService loginService = new YDLoginService();
         session = loginService.login(new LegacyProfile(username, password));
         YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
@@ -111,7 +108,7 @@ public class MiroaLauncher {
         return true;
     }
 
-    public void logout() throws Exception {
+    void logout() throws Exception {
         YDLoginService loginService = new YDLoginService();
         YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
         try {
@@ -128,11 +125,11 @@ public class MiroaLauncher {
         loggedIn = false;
     }
 
-    public boolean isLoggedIn() {
+    boolean isLoggedIn() {
         return loggedIn;
     }
 
-    public String getUsername() {
+    String getUsername() {
         if (profiles.length > 0) {
             return profiles[0].getName();
         }
@@ -140,7 +137,7 @@ public class MiroaLauncher {
     }
 
 
-    public String getMemory() {
+    String getMemory() {
         String memory = optionSaver.get("memory");
         if (checkMemory(memory)) {
             return memory;
@@ -149,7 +146,7 @@ public class MiroaLauncher {
         }
     }
 
-    public boolean setMemory(String memory) {
+    boolean setMemory(String memory) {
         if (checkMemory(memory)) {
             if (DEFAULT_MEMORY.equals(memory))
                 optionSaver.remove("memory");
@@ -161,7 +158,7 @@ public class MiroaLauncher {
         }
     }
 
-    public boolean checkMemory(String memory) {
+    private boolean checkMemory(String memory) {
         for (MemoryOption memOpt : memoryOptions) {
             if (memOpt.getJavaOption().equals(memory)) {
                 return true;
@@ -178,7 +175,7 @@ public class MiroaLauncher {
         }
     }
 
-    public String getJavaBin() {
+    String getJavaBin() {
         String java = optionSaver.get("java");
         if (java != null && !"".equals(java) && checkJavaBin(java)) {
             return java;
@@ -187,7 +184,7 @@ public class MiroaLauncher {
         }
     }
 
-    public boolean setJavaBin(String java) {
+    boolean setJavaBin(String java) {
         if (checkJavaBin(java)) {
             if (DEFAULT_JAVA.equals(java))
                 optionSaver.remove("java");
@@ -199,7 +196,7 @@ public class MiroaLauncher {
         }
     }
 
-    public boolean checkJavaBin(String java) {
+    boolean checkJavaBin(String java) {
         File file = new File(java);
         return file.exists() && file.canExecute();
     }

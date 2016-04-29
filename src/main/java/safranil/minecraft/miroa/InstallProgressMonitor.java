@@ -6,7 +6,7 @@ import sk.tomsik68.mclauncher.api.ui.IProgressMonitor;
 class InstallProgressMonitor implements IProgressMonitor {
     private double progress;
     private double max;
-    private MainController controller;
+    private final MainController controller;
 
     private boolean canUpdateGUI = true;
 
@@ -34,9 +34,7 @@ class InstallProgressMonitor implements IProgressMonitor {
 
     @Override
     public void setStatus(String s) {
-        PlatformImpl.runLater(() -> {
-            controller.subInfoLabel.setText(s);
-        });
+        PlatformImpl.runLater(() -> controller.subInfoLabel.setText(s));
     }
 
     private void updateGUI() {

@@ -8,7 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class OperatingSystemOverwritter implements IOperatingSystem {
-    private IOperatingSystem os;
+    private final IOperatingSystem os;
     private File workDir;
 
     public OperatingSystemOverwritter(IOperatingSystem os) {
@@ -33,7 +33,7 @@ public class OperatingSystemOverwritter implements IOperatingSystem {
     @Override
     public File getWorkingDirectory() {
         if(this.workDir == null) {
-            String path = null;
+            String path;
             try {
                 path = (new File(Platform.getCurrentPlatform().getWorkingDirectory() + "/..")).getCanonicalPath();
             } catch (IOException e) {

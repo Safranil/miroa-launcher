@@ -1,7 +1,6 @@
 package safranil.minecraft.miroa;
 
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -27,21 +26,22 @@ public class OptionController {
     Button logoutButton;
 
 
+    @SuppressWarnings("WeakerAccess")
     @FXML
-    public void closeAction(ActionEvent event) {
+    public void closeAction() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
         stage.close();
     }
 
     @FXML
-    public void saveAction(ActionEvent event) {
+    public void saveAction() {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
 
         if (launcher.checkJavaBin(javaField.getText())) {
             launcher.setJavaBin(javaField.getText());
             launcher.setMemory(memoryChoice.getValue().getJavaOption());
 
-            closeAction(event);
+            closeAction();
         }
         else {
             Alert error = new Alert(Alert.AlertType.ERROR);
@@ -54,7 +54,7 @@ public class OptionController {
     }
 
     @FXML
-    public void logoutAction(ActionEvent event) {
+    public void logoutAction() {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
         try {
             launcher.logout();
@@ -66,7 +66,7 @@ public class OptionController {
     }
 
     @FXML
-    public void selectJavaAction(ActionEvent event) {
+    public void selectJavaAction() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Chemin vers l'exécutable Java");
 
