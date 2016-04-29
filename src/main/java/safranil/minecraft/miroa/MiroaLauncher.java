@@ -21,6 +21,7 @@ public class MiroaLauncher {
 
     public static final String DEFAULT_MEMORY = "2048M";
     public static final int DEFAULT_MEMORY_ID = 4;
+    public static final String MC_VERSION = "1.7.10";
 
     public static final String DEFAULT_JAVA = getDefaultJava();
     public static final File LAUNCHER_FOLDER = OS.getWorkingDirectory();
@@ -31,7 +32,7 @@ public class MiroaLauncher {
 
     private OptionSaver optionSaver = new OptionSaver(new File(LAUNCHER_FOLDER.getPath() + "/launcher.properties"));
     private IProfile[] profiles = {};
-    private ISession session;
+    ISession session;
     private boolean loggedIn = false;
     MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.LAUNCHER_FOLDER);
 

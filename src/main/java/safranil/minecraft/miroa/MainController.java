@@ -13,8 +13,8 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import sk.tomsik68.mclauncher.api.versions.IVersion;
-import sk.tomsik68.mclauncher.impl.versions.mcdownload.MCDownloadVersionList;
+import sk.tomsik68.mclauncher.backend.MinecraftLauncherBackend;
+import sk.tomsik68.mclauncher.impl.common.Platform;
 
 import java.io.IOException;
 
@@ -116,12 +116,13 @@ public class MainController {
                     });
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
+                    MinecraftLauncherBackend launcherBackend = new MinecraftLauncherBackend(Platform.getCurrentPlatform().getWorkingDirectory());
 
-                    MCDownloadVersionList mcd = new MCDownloadVersionList();
                     try {
-                        mcd.startDownload();
-                        IVersion version = mcd.retrieveVersionInfo("1.7.10");
-                        version.getInstaller().install(version, launcher.mc, new InstallProgressMonitor(_this));
+                        launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(_this));
+                        ProcessBuilder pb = launcherBackend.launchMinecraft(launcher.session, MiroaLauncher.MC_VERSION);
+                        Process p = pb.start();
+                        p.waitFor();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
