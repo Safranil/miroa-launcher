@@ -12,10 +12,17 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import safranil.minecraft.mclauncherapi.InstallProgressMonitor;
+import safranil.minecraft.mclauncherapi.LaunchSettings;
 import sk.tomsik68.mclauncher.backend.MinecraftLauncherBackend;
 import sk.tomsik68.mclauncher.impl.common.Platform;
+import sk.tomsik68.mclauncher.util.FileUtils;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.rmi.UnexpectedException;
 
 public class MainController {
     @FXML
@@ -107,25 +114,58 @@ public class MainController {
                         progress.setVisible(true);
                         progress.setStyle(" -fx-progress-color: limegreen;");
                         progress.setProgress(-1);
-                        infoLabel.setText("Installation de Minecraft...");
+                        infoLabel.setText("Veuillez patienter...");
                         loginPane.setOpacity(0.25);
                         infoPane.setVisible(true);
                     });
+
+                    createForgeVersionFile();
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
                     MinecraftLauncherBackend launcherBackend = new MinecraftLauncherBackend(Platform.getCurrentPlatform().getWorkingDirectory());
 
                     try {
-                        launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(_this));
-                        ProcessBuilder pb = launcherBackend.launchMinecraft(launcher.session, MiroaLauncher.MC_VERSION);
+                        PlatformImpl.runAndWait(() -> infoLabel.setText("Installation de Minecraft..."));
+                        //launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
+
+                        PlatformImpl.runAndWait(() -> {
+                            infoLabel.setText("Installation de Forge...");
+                            subInfoLabel.setText("");
+                            progress.setStyle(" -fx-progress-color: #cb3d35;");
+                            progress.setProgress(-1);
+                        });
+
+                        launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
+                        PlatformImpl.runAndWait(() -> {
+                            infoLabel.setText("Lancement du jeu");
+                            subInfoLabel.setText("");
+                            progress.setStyle(" -fx-progress-color: royalblue;");
+                            progress.setProgress(-1);
+                        });
+                        ProcessBuilder pb = launcherBackend.launchMinecraft(
+                                launcher.session,
+                                null,
+                                MiroaLauncher.FORGE_VERSION,
+                                new LaunchSettings(launcher.getMemory(), new File(launcher.getJavaBin())),
+                                null
+                        );
 
                         PlatformImpl.runLater(() -> Main.mainStage.hide());
 
+                        pb.directory(MiroaLauncher.OS.getWorkingDirectory());
                         Process p = pb.start();
 
-                        int returnValue = p.waitFor();
+                        /*int returnValue = p.waitFor();
                         if (returnValue == 0) {
-                            PlatformImpl.exit();
+                            //PlatformImpl.exit();
+                        }*/
+                        BufferedReader br = new BufferedReader(
+                                new InputStreamReader(p.getInputStream()));
+                        String line;
+                        while (p.isAlive()) {
+                            line = br.readLine();
+                            if (line != null && line.length() > 0)
+                                System.out.println(line);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -148,6 +188,19 @@ public class MainController {
         });
 
         t.start();
+    }
+
+    private void createForgeVersionFile() {
+
+        File forgeVersion = new File(MiroaLauncher.OS.getWorkingDirectory(), "versions/" + MiroaLauncher.FORGE_VERSION + "/" + MiroaLauncher.FORGE_VERSION + ".json");
+        if (!forgeVersion.exists()) {
+            try {
+                FileUtils.createFileSafely(forgeVersion);
+                org.apache.commons.io.FileUtils.copyURLToFile(getClass().getResource("forgeVersion.json"), forgeVersion);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML

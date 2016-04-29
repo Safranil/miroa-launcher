@@ -20,6 +20,7 @@ class MiroaLauncher {
     private static final String DEFAULT_MEMORY = "2048M";
     static final int DEFAULT_MEMORY_ID = 4;
     static final String MC_VERSION = "1.7.10";
+    static final String FORGE_VERSION = "1.7.10-Forge10.13.4.1558-1.7.10";
 
     private static final String DEFAULT_JAVA = getDefaultJava();
 

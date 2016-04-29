@@ -1,17 +1,21 @@
-package safranil.minecraft.miroa;
+package safranil.minecraft.mclauncherapi;
 
 import com.sun.javafx.application.PlatformImpl;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import sk.tomsik68.mclauncher.api.ui.IProgressMonitor;
 
-class InstallProgressMonitor implements IProgressMonitor {
+public class InstallProgressMonitor implements IProgressMonitor {
     private double progress;
     private double max;
-    private final MainController controller;
+    private final ProgressIndicator progressIndicator;
+    private final Label label;
 
     private boolean canUpdateGUI = true;
 
-    InstallProgressMonitor(MainController controller) {
-        this.controller = controller;
+    public InstallProgressMonitor(ProgressIndicator progressIndicator, Label label) {
+        this.progressIndicator = progressIndicator;
+        this.label = label;
     }
 
 
@@ -34,14 +38,14 @@ class InstallProgressMonitor implements IProgressMonitor {
 
     @Override
     public void setStatus(String s) {
-        PlatformImpl.runLater(() -> controller.subInfoLabel.setText(s));
+        PlatformImpl.runLater(() -> label.setText(s));
     }
 
     private void updateGUI() {
         if (max > 0 && (canUpdateGUI || progress == max)) {
             canUpdateGUI = false;
             PlatformImpl.runLater(() -> {
-                controller.progress.setProgress(progress / max);
+                progressIndicator.setProgress(progress / max);
                 canUpdateGUI = true;
             });
         }

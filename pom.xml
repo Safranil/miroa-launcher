@@ -41,15 +41,37 @@
             <artifactId>gson</artifactId>
             <version>2.6.2</version>
         </dependency>
+        <!--<dependency>-->
+        <!--<groupId>sk.tomsik68</groupId>-->
+        <!--<artifactId>mclauncher-api</artifactId>-->
+        <!--<version>0.3.1</version>-->
+        <!--</dependency>-->
+        <!-- Start MCLauncherAPI -->
         <dependency>
-            <groupId>sk.tomsik68</groupId>
-            <artifactId>mclauncher-api</artifactId>
-            <version>0.3.1</version>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>1.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <dependency>
+            <groupId>com.flowpowered</groupId>
+            <artifactId>flow-nbt</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <!-- End MCLauncherAPI -->
         <dependency>
             <groupId>com.akathist.maven.plugins.launch4j</groupId>
             <artifactId>launch4j-maven-plugin</artifactId>
             <version>1.7.10</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.5</version>
         </dependency>
     </dependencies>
     <build>
@@ -61,6 +83,9 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                    <includes>
+                        <include>/mclauncher-api/src/main/java/**</include>
+                    </includes>
                 </configuration>
             </plugin>
             <plugin>
