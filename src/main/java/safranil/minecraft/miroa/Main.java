@@ -1,23 +1,12 @@
 package safranil.minecraft.miroa;
 
 import com.sun.javafx.application.PlatformImpl;
-import fr.theshark34.openauth.AuthenticationException;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import sk.tomsik68.mclauncher.api.common.MCLauncherAPI;
-import sk.tomsik68.mclauncher.api.login.ISession;
-import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
-
-import java.io.File;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 
 public class Main extends Application {
     static Scene mainScene;
