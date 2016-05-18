@@ -126,7 +126,7 @@ public class MainController {
 
                     try {
                         PlatformImpl.runAndWait(() -> infoLabel.setText("Installation de Minecraft..."));
-                        //launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
+                        launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
                         PlatformImpl.runAndWait(() -> {
                             infoLabel.setText("Installation de Forge...");
@@ -134,8 +134,8 @@ public class MainController {
                             progress.setStyle(" -fx-progress-color: #cb3d35;");
                             progress.setProgress(-1);
                         });
+                        //launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
-                        launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
                         PlatformImpl.runAndWait(() -> {
                             infoLabel.setText("Lancement du jeu");
                             subInfoLabel.setText("");

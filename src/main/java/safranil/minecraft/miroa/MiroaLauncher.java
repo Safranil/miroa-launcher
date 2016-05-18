@@ -112,15 +112,7 @@ class MiroaLauncher {
     void logout() throws Exception {
         YDLoginService loginService = new YDLoginService();
         YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
-        try {
-            loginService.logout(session);
-        } catch (ClassCastException ignored) {
-            /*
-             See the issue here : https://github.com/tomsik68/mclauncher-api/issues/23
-             This is a temporary workaround
-             TODO: Remove this try catch
-             */
-        }
+        loginService.logout(session);
         io.write(new IProfile[]{});
 
         loggedIn = false;
