@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -22,7 +23,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.rmi.UnexpectedException;
 
 public class MainController {
     @FXML
@@ -47,16 +47,23 @@ public class MainController {
     @FXML
     GridPane infoPane;
 
+    @FXML
+    Pane loading;
+
     public void setToPlay() {
         playButton.setText("Jouer");
         loginField.setDisable(true);
         passwordField.setDisable(true);
+        playButton.setDisable(false);
+        optionsButton.setDisable(false);
     }
 
     public void setToLogin() {
         playButton.setText("Connexion");
         loginField.setDisable(false);
         passwordField.setDisable(false);
+        playButton.setDisable(false);
+        optionsButton.setDisable(false);
     }
 
     @FXML
@@ -75,7 +82,7 @@ public class MainController {
                         progress.setVisible(true);
                         loginPane.setOpacity(0.25);
                         infoPane.setVisible(true);
-                        progress.setStyle(" -fx-progress-color: limegreen;");
+                        progress.setStyle("-fx-progress-color: limegreen;");
                         infoLabel.setText("Connexion en cours...");
                     });
 
@@ -112,7 +119,7 @@ public class MainController {
                         loginField.setDisable(true);
                         passwordField.setDisable(true);
                         progress.setVisible(true);
-                        progress.setStyle(" -fx-progress-color: limegreen;");
+                        progress.setStyle("-fx-progress-color: limegreen;");
                         progress.setProgress(-1);
                         infoLabel.setText("Veuillez patienter...");
                         loginPane.setOpacity(0.25);
@@ -131,7 +138,7 @@ public class MainController {
                         PlatformImpl.runAndWait(() -> {
                             infoLabel.setText("Installation de Forge...");
                             subInfoLabel.setText("");
-                            progress.setStyle(" -fx-progress-color: #cb3d35;");
+                            progress.setStyle("-fx-progress-color: #cb3d35;");
                             progress.setProgress(-1);
                         });
                         //launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
