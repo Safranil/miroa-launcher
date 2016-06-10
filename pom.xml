@@ -9,12 +9,12 @@
     <version>1.0-SNAPSHOT</version>
 
     <repositories>
-        <repository>
-            <id>project</id>
-            <name>Local project repo</name>
-            <layout>default</layout>
-            <url>file://${project.basedir}/libs</url>
-        </repository>
+        <!--<repository>-->
+            <!--<id>project</id>-->
+            <!--<name>Local project repo</name>-->
+            <!--<layout>default</layout>-->
+            <!--<url>file://${project.basedir}/libs</url>-->
+        <!--</repository>-->
         <repository>
             <id>dsol-xml</id>
             <name>Simulation @ TU Delft</name>
@@ -27,6 +27,11 @@
             <id>central</id>
             <name>Central Repository</name>
             <url>http://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>sk_tomsik68</id>
+            <name>Tomsik68's maven repository</name>
+            <url>https://raw.githubusercontent.com/tomsik68/maven-repo/master/</url>
         </repository>
     </repositories>
 
@@ -51,6 +56,22 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
         </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <!--<dependency>-->
+            <!-- For debugging open files -->
+            <!--<groupId>org.kohsuke</groupId>-->
+            <!--<artifactId>file-leak-detector</artifactId>-->
+            <!--<version>1.8</version>-->
+        <!--</dependency>-->
     </dependencies>
     <build>
         <plugins>
