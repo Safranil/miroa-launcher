@@ -31,7 +31,9 @@ class Updater {
         File localFile = new File(ws, "package.json");
         if (localFile.exists() && localFile.canRead()) {
             log.info("No package information stored locally");
-            localJson = (JSONObject) JSONValue.parse(new FileReader(localFile));
+            FileReader fileReader = new FileReader(localFile);
+            localJson = (JSONObject) JSONValue.parse(fileReader);
+            fileReader.close();
         }
 
         JSONArray fileToDelete = new JSONArray();
