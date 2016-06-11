@@ -24,6 +24,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+/**
+ * Some utils to display messages
+ */
 class Utils {
     /**
      * Show a dialog with an exception inside

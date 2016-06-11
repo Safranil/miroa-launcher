@@ -1,17 +1,17 @@
 /**
  * This file is part of Miroa Launcher.
  * Copyright (C) 2016 David Cachau <dev@safranil.fr>
- *
+ * <p>
  * Miroa Launcher is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * any later version.
- *
+ * <p>
  * Miroa Launcher is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,8 +22,8 @@ import net.minidev.json.JSONObject;
 import net.minidev.json.JSONValue;
 import org.apache.commons.codec.digest.DigestUtils;
 import sk.tomsik68.mclauncher.api.ui.IProgressMonitor;
-import sk.tomsik68.mclauncher.util.FileUtils;
 import sk.tomsik68.mclauncher.util.HttpUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -31,11 +31,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+/**
+ * Custom updater that connect to a custom server for :
+ *  - Download missing lib for forge
+ *  - Download mods & configs
+ */
 class Updater {
     private static Logger log = Logger.getLogger(Updater.class.getName());
-    private static String serverUrl = "http://static.safranil.fr/minecraft/update.json";
 
-    public static void update(File ws, IProgressMonitor progress) throws Exception {
+    /**
+     * Update custom files
+     *
+     * @param minecraft Launcher working directory
+     * @param progress Progress monitor
+     * @throws Exception
+     */
+    static void update(File minecraft, IProgressMonitor progress) throws Exception {
+        String serverUrl = "http://static.safranil.fr/minecraft/update.json";
+
+        // Download package information from the server
         log.info("Downloading package informations");
         String jsonString = HttpUtils.httpGet(serverUrl);
         JSONObject updateJson = (JSONObject) JSONValue.parse(jsonString);
@@ -44,8 +58,9 @@ class Updater {
             throw new Exception("Unable to get the update file.");
         }
 
+        // Load the local package infos
         JSONObject localJson = null;
-        File localFile = new File(ws, "package.json");
+        File localFile = new File(minecraft, "package.json");
         if (localFile.exists() && localFile.canRead()) {
             log.info("No package information stored locally");
             FileReader fileReader = new FileReader(localFile);
@@ -63,15 +78,14 @@ class Updater {
         if (localJson == null) {
             log.info("Rule : Downloading all file");
             fileToDownload = (JSONArray) updateJson.get("files");
-        }
-        else {
+        } else {
             log.info("Rule : Delta calculation");
             calculateDelta((JSONArray) localJson.get("files"), (JSONArray) updateJson.get("files"), fileToDelete, fileToDownload);
         }
 
-        File tempDir = new File(ws, "tmpdl");
+        File tempDir = new File(minecraft, "tmpdl");
         if (!tempDir.exists()) {
-            tempDir.mkdir();
+            FileUtils.forceMkdir(tempDir);
         }
 
         log.info("Downloading files...");
@@ -83,7 +97,7 @@ class Updater {
             Integer size = (Integer) json.get("size");
             File destFile = new File(tempDir, file);
 
-            if (!destFile.getAbsolutePath().startsWith(ws.getAbsolutePath())) {
+            if (!destFile.getAbsolutePath().startsWith(minecraft.getAbsolutePath())) {
                 log.severe("Unsafe modification detected, the directory is outside of the launcher for ".concat(file));
                 throw new Exception("Update file contain unsafe modification, aborting process !");
             }
@@ -95,7 +109,7 @@ class Updater {
                         || !DigestUtils.sha1Hex(fis).equals(hash)) {
                     log.info("Deleting errored file ".concat(file));
                     fis.close();
-                    destFile.delete();
+                    FileUtils.forceDelete(destFile);
                 } else {
                     continue;
                 }
@@ -103,15 +117,15 @@ class Updater {
 
             log.info("Downloading file at ".concat(url));
             progress.setStatus("Downloading ".concat(file));
-            FileUtils.downloadFileWithProgress(url, destFile, progress);
+            sk.tomsik68.mclauncher.util.FileUtils.downloadFileWithProgress(url, destFile, progress);
         }
 
-        deleteFiles(fileToDelete, ws);
-        moveFiles(fileToDownload, tempDir, ws);
+        deleteFiles(fileToDelete, minecraft);
+        moveFiles(fileToDownload, tempDir, minecraft);
 
-        org.apache.commons.io.FileUtils.forceDeleteOnExit(tempDir);
+        FileUtils.forceDeleteOnExit(tempDir);
 
-        FileUtils.writeFile(localFile, jsonString);
+        sk.tomsik68.mclauncher.util.FileUtils.writeFile(localFile, jsonString);
     }
 
     private static void moveFiles(JSONArray fileToMove, File tempDir, File ws) throws Exception {
@@ -127,13 +141,13 @@ class Updater {
                 throw new Exception("Update file contain unsafe modification, aborting process !");
             }
 
-            dst.delete();
-            org.apache.commons.io.FileUtils.moveFileToDirectory(src, dst.getParentFile(), true);
+            FileUtils.forceDelete(dst);
+            FileUtils.moveFileToDirectory(src, dst.getParentFile(), true);
         }
 
     }
 
-    private static void deleteFiles(JSONArray fileToDelete, File ws) {
+    private static void deleteFiles(JSONArray fileToDelete, File ws) throws IOException {
         for (Object aFileToDelete : fileToDelete) {
             JSONObject json = (JSONObject) aFileToDelete;
             String fileStr = (String) json.get("name");
@@ -141,15 +155,22 @@ class Updater {
             //File parent = file.getParentFile();
 
             log.info("deleting file ".concat(fileStr));
-            file.delete();
+            FileUtils.forceDelete(file);
 
             // @TODO Remove empty directory
         }
     }
 
+    /**
+     * Compare the local and remote package informations
+     * @param local local json
+     * @param update remote json
+     * @param fileToDelete all file to delete array
+     * @param fileToDownload all file to download array
+     */
     private static void calculateDelta(JSONArray local, JSONArray update, JSONArray fileToDelete, JSONArray fileToDownload) {
-        JSONObject lJson, uJson = null;
-        String lStr, uStr = null;
+        JSONObject lJson, uJson;
+        String lStr, uStr;
         int lSize, uSize;
 
         lSize = local.size();

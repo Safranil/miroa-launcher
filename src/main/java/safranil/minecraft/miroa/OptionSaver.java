@@ -23,6 +23,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.util.Properties;
 
+/**
+ * Save some option in a .properties file
+ */
 class OptionSaver {
     private final File file;
     private final Properties properties;

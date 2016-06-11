@@ -47,6 +47,7 @@ public class Main extends Application {
         MiroaLauncher launcher = MiroaLauncher.getInstance();
         launcher.setMainController(controller);
 
+        // Do some work in a separate thread
         Thread t = new Starter();
         t.start();
     }

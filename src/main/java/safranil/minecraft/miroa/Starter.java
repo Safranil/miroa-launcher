@@ -17,13 +17,13 @@
  */
 package safranil.minecraft.miroa;
 
-import com.sun.java.swing.plaf.motif.resources.motif_ja;
 import com.sun.javafx.application.PlatformImpl;
-import javafx.scene.control.Alert;
-import javafx.stage.Stage;
 
 import java.net.InetAddress;
 
+/**
+ * Thread to do some actions at the startup (Mojang is online, Mojang token verification, ...)
+ */
 class Starter extends Thread {
     Starter() {
 

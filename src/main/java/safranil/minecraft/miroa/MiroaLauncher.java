@@ -31,6 +31,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+/**
+ * Launcher class that do some work and store some info for the launcher
+ */
 class MiroaLauncher {
     static final IOperatingSystem OS = new OperatingSystemOverwritter(Platform.getCurrentPlatform());
 
@@ -83,12 +86,17 @@ class MiroaLauncher {
         this.mainController = mainController;
     }
 
+    /**
+     * Do the login work
+     * @return authenticated via the Mojang service
+     */
     boolean login() {
         try {
             YDLoginService loginService = new YDLoginService();
             YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
             profiles = io.read();
 
+            // Check if a profile exist and take the first item (the launcher use and store only one profile)
             if (profiles.length > 0) {
                 loginService.load(Platform.getCurrentPlatform().getWorkingDirectory());
                 session = loginService.login(profiles[0]);
@@ -110,6 +118,13 @@ class MiroaLauncher {
         return false;
     }
 
+    /**
+     *
+     * @param username username to send
+     * @param password password to send
+     * @return Always return true
+     * @throws Exception
+     */
     @SuppressWarnings("SameReturnValue")
     boolean login(String username, String password) throws Exception {
         YDLoginService loginService = new YDLoginService();
@@ -126,6 +141,10 @@ class MiroaLauncher {
         return true;
     }
 
+    /**
+     * Disconnect and revoke the client token
+     * @throws Exception
+     */
     void logout() throws Exception {
         YDLoginService loginService = new YDLoginService();
         YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
@@ -135,6 +154,10 @@ class MiroaLauncher {
         loggedIn = false;
     }
 
+    /**
+     * Check if user is logged in
+     * @return true if logged
+     */
     boolean isLoggedIn() {
         return loggedIn;
     }
@@ -145,7 +168,6 @@ class MiroaLauncher {
         }
         return "";
     }
-
 
     String getMemory() {
         String memory = optionSaver.get("memory");

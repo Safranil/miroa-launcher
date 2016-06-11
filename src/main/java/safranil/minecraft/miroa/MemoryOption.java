@@ -17,6 +17,9 @@
  */
 package safranil.minecraft.miroa;
 
+/**
+ * Memory option that can be displayed
+ */
 class MemoryOption {
     private final String javaOption;
     private final String displayString;
