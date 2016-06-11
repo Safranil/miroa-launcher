@@ -146,7 +146,8 @@ public class MainController {
                             progress.setProgress(-1);
                         });
 
-                        Updater.update(MiroaLauncher.OS.getWorkingDirectory() ,new InstallProgressMonitor(progress, subInfoLabel));
+                        Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(progress, subInfoLabel));
+                        launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
                         PlatformImpl.runAndWait(() -> {
                             infoLabel.setText("Lancement du jeu");
@@ -154,7 +155,7 @@ public class MainController {
                             progress.setStyle(" -fx-progress-color: royalblue;");
                             progress.setProgress(-1);
                         });
-/*                        ProcessBuilder pb = launcherBackend.launchMinecraft(
+                        ProcessBuilder pb = launcherBackend.launchMinecraft(
                                 launcher.session,
                                 null,
                                 MiroaLauncher.FORGE_VERSION,
@@ -165,20 +166,20 @@ public class MainController {
                         PlatformImpl.runLater(() -> Main.mainStage.hide());
 
                         pb.directory(MiroaLauncher.OS.getWorkingDirectory());
-                        /*Process p = pb.start();
+                        Process p = pb.start();
 
                         /*int returnValue = p.waitFor();
                         if (returnValue == 0) {
                             //PlatformImpl.exit();
                         }*/
-                        /*BufferedReader br = new BufferedReader(
+                        BufferedReader br = new BufferedReader(
                                 new InputStreamReader(p.getInputStream()));
                         String line;
                         while (p.isAlive()) {
                             line = br.readLine();
                             if (line != null && line.length() > 0)
                                 System.out.println(line);
-                        }*/
+                        }
                     } catch (Exception e) {
                         Utils.displayException("Erreur lors du téléchargement", "Une erreur c'est produite lors du téléchargement.", e);
                     }
