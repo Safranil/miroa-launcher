@@ -190,12 +190,12 @@ public class MainController {
                             PlatformImpl.runLater(() -> Main.mainStage.hide());
 
                             pb.directory(MiroaLauncher.OS.getWorkingDirectory());
+
+                            pb.redirectError(new File(MiroaLauncher.OS.getWorkingDirectory(), "minecraft.err.log"));
+                            pb.redirectOutput(new File(MiroaLauncher.OS.getWorkingDirectory(), "minecraft.out.log"));
+
                             Process p = pb.start();
 
-                            /*int returnValue = p.waitFor();
-                            if (returnValue == 0) {
-                                //PlatformImpl.exit();
-                            }*/
                             BufferedReader br = new BufferedReader(
                                     new InputStreamReader(p.getInputStream()));
                             String line;
