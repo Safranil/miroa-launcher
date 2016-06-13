@@ -20,6 +20,7 @@ package fr.safranil.minecraft.miroa;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -33,7 +34,14 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         AnchorPane root = loader.load();
         primaryStage.setTitle("Miroa");
-        //primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("icon.png")));
+
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft16.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft32.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft48.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft64.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft128.png")));
+        primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft256.png")));
+
         primaryStage.setScene(new Scene(root, 750, 450));
         primaryStage.show();
         primaryStage.setMinHeight(primaryStage.getHeight());
