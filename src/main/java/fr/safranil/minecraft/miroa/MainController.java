@@ -15,9 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
-package safranil.minecraft.miroa;
+package fr.safranil.minecraft.miroa;
 
 import com.sun.javafx.application.PlatformImpl;
+import fr.safranil.minecraft.mclauncherapi.InstallProgressMonitor;
+import fr.safranil.minecraft.mclauncherapi.LaunchSettings;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,8 +33,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import safranil.minecraft.mclauncherapi.InstallProgressMonitor;
-import safranil.minecraft.mclauncherapi.LaunchSettings;
 import sk.tomsik68.mclauncher.backend.MinecraftLauncherBackend;
 import sk.tomsik68.mclauncher.impl.common.Platform;
 import sk.tomsik68.mclauncher.util.FileUtils;
@@ -89,7 +89,6 @@ public class MainController {
 
     @FXML
     public void playAction() {
-        MainController _this = this;
         Thread t = new Thread(new Task<Void>() {
             @Override
             public Void call() {
@@ -152,6 +151,7 @@ public class MainController {
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
                     MinecraftLauncherBackend launcherBackend = new MinecraftLauncherBackend(Platform.getCurrentPlatform().getWorkingDirectory());
 
+                    boolean canLaunch = false;
                     try {
                         PlatformImpl.runAndWait(() -> infoLabel.setText("Installation de Minecraft..."));
                         launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
@@ -166,39 +166,47 @@ public class MainController {
                         Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(progress, subInfoLabel));
                         launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
-                        PlatformImpl.runAndWait(() -> {
-                            infoLabel.setText("Lancement du jeu");
-                            subInfoLabel.setText("");
-                            progress.setStyle(" -fx-progress-color: royalblue;");
-                            progress.setProgress(-1);
-                        });
-                        ProcessBuilder pb = launcherBackend.launchMinecraft(
-                                launcher.session,
-                                null,
-                                MiroaLauncher.FORGE_VERSION,
-                                new LaunchSettings(launcher.getMemory(), new File(launcher.getJavaBin())),
-                                null
-                        );
-
-                        PlatformImpl.runLater(() -> Main.mainStage.hide());
-
-                        pb.directory(MiroaLauncher.OS.getWorkingDirectory());
-                        Process p = pb.start();
-
-                        /*int returnValue = p.waitFor();
-                        if (returnValue == 0) {
-                            //PlatformImpl.exit();
-                        }*/
-                        BufferedReader br = new BufferedReader(
-                                new InputStreamReader(p.getInputStream()));
-                        String line;
-                        while (p.isAlive()) {
-                            line = br.readLine();
-                            if (line != null && line.length() > 0)
-                                System.out.println(line);
-                        }
+                        canLaunch = true;
                     } catch (Exception e) {
                         Utils.displayException("Erreur lors du téléchargement", "Une erreur c'est produite lors du téléchargement.", e);
+                    }
+
+                    if (canLaunch) {
+                        try {
+                            PlatformImpl.runAndWait(() -> {
+                                infoLabel.setText("Lancement du jeu");
+                                subInfoLabel.setText("");
+                                progress.setStyle(" -fx-progress-color: royalblue;");
+                                progress.setProgress(-1);
+                            });
+                            ProcessBuilder pb = launcherBackend.launchMinecraft(
+                                    launcher.session,
+                                    null,
+                                    MiroaLauncher.FORGE_VERSION,
+                                    new LaunchSettings(launcher.getMemory(), new File(launcher.getJavaBin())),
+                                    null
+                            );
+
+                            PlatformImpl.runLater(() -> Main.mainStage.hide());
+
+                            pb.directory(MiroaLauncher.OS.getWorkingDirectory());
+                            Process p = pb.start();
+
+                            /*int returnValue = p.waitFor();
+                            if (returnValue == 0) {
+                                //PlatformImpl.exit();
+                            }*/
+                            BufferedReader br = new BufferedReader(
+                                    new InputStreamReader(p.getInputStream()));
+                            String line;
+                            while (p.isAlive()) {
+                                line = br.readLine();
+                                if (line != null && line.length() > 0)
+                                    System.out.println(line);
+                            }
+                        } catch (Exception e) {
+                            Utils.displayException("Erreur lors du lancement", "Une erreur c'est produite lors du lancement du jeu.", e);
+                        }
                     }
 
                     PlatformImpl.runAndWait(() -> {

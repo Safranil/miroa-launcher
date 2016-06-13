@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
-package safranil.minecraft.mclauncherapi;
+package fr.safranil.minecraft.mclauncherapi;
 
 import sk.tomsik68.mclauncher.api.common.ILaunchSettings;
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
-package safranil.minecraft.miroa;
+package fr.safranil.minecraft.miroa;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -46,6 +46,8 @@ public class Main extends Application {
         MainController controller = loader.getController();
         MiroaLauncher launcher = MiroaLauncher.getInstance();
         launcher.setMainController(controller);
+
+        controller.loading.setVisible(true);
 
         // Do some work in a separate thread
         Thread t = new Starter();

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
-package safranil.minecraft.mclauncherapi;
+package fr.safranil.minecraft.mclauncherapi;
 
 import com.sun.javafx.application.PlatformImpl;
 import javafx.scene.control.Label;
@@ -49,7 +49,7 @@ public class InstallProgressMonitor implements IProgressMonitor {
 
     @Override
     public void incrementProgress(int i) {
-        progress++;
+        progress += i;
         updateGUI();
     }
 
@@ -59,10 +59,13 @@ public class InstallProgressMonitor implements IProgressMonitor {
     }
 
     private void updateGUI() {
-        if (max > 0 && (canUpdateGUI || progress == max)) {
+        if (max > 0 && (canUpdateGUI || progress >= max)) {
             canUpdateGUI = false;
             PlatformImpl.runLater(() -> {
                 progressIndicator.setProgress(progress / max);
+                try {
+                    Thread.sleep(40);
+                } catch (InterruptedException ignored) {}
                 canUpdateGUI = true;
             });
         }

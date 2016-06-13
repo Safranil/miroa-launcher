@@ -102,7 +102,7 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>safranil.minecraft.miroa.Main</mainClass>
+                            <mainClass>fr.safranil.minecraft.miroa.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

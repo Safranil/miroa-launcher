@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
-package safranil.minecraft.miroa;
+package fr.safranil.minecraft.miroa;
 
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
@@ -141,7 +141,9 @@ class Updater {
                 throw new Exception("Update file contain unsafe modification, aborting process !");
             }
 
-            FileUtils.forceDelete(dst);
+            if (dst.exists()) {
+                FileUtils.forceDelete(dst);
+            }
             FileUtils.moveFileToDirectory(src, dst.getParentFile(), true);
         }
 
