@@ -25,10 +25,7 @@ import sk.tomsik68.mclauncher.api.ui.IProgressMonitor;
 import sk.tomsik68.mclauncher.util.HttpUtils;
 import org.apache.commons.io.FileUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Logger;
 
 /**
@@ -80,7 +77,7 @@ class Updater {
             fileToDownload = (JSONArray) updateJson.get("files");
         } else {
             log.info("Rule : Delta calculation");
-            calculateDelta((JSONArray) localJson.get("files"), (JSONArray) updateJson.get("files"), fileToDelete, fileToDownload);
+            calculateDelta((JSONArray) localJson.get("files"), (JSONArray) updateJson.get("files"), fileToDelete, fileToDownload, minecraft);
         }
 
         File tempDir = new File(minecraft, "tmpdl");
@@ -157,7 +154,8 @@ class Updater {
             //File parent = file.getParentFile();
 
             log.info("deleting file ".concat(fileStr));
-            FileUtils.forceDelete(file);
+            if (file.exists())
+                FileUtils.forceDelete(file);
 
             // @TODO Remove empty directory
         }
@@ -170,9 +168,10 @@ class Updater {
      * @param fileToDelete all file to delete array
      * @param fileToDownload all file to download array
      */
-    private static void calculateDelta(JSONArray local, JSONArray update, JSONArray fileToDelete, JSONArray fileToDownload) {
+    private static void calculateDelta(JSONArray local, JSONArray update, JSONArray fileToDelete, JSONArray fileToDownload, File ws) {
         JSONObject lJson, uJson;
-        String lStr, uStr;
+        String lStr, uStr, fStr;
+        FileInputStream fis;
         int lSize, uSize;
 
         lSize = local.size();
@@ -184,10 +183,28 @@ class Updater {
                 lStr = (String) uJson.get("name");
                 uStr = (String) lJson.get("name");
                 if (lStr.equals(uStr)) {
+                    fis = null;
+                    fStr = "";
+                    try {
+                        fis = new FileInputStream(new File(ws, lStr));
+                        fStr = DigestUtils.sha1Hex(fis);
+                    } catch (FileNotFoundException ignored) {
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    finally {
+                        if (fis != null)
+                            try {
+                                fis.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                    }
+
                     lStr = (String) ((JSONObject) update.get(i)).get("checksum");
                     uStr = (String) ((JSONObject) update.get(j)).get("checksum");
 
-                    if (!lStr.equals(uStr)) {
+                    if (!lStr.equals(uStr) || !lStr.equals(fStr)) {
                         fileToDelete.add(uJson);
                         fileToDownload.add(lJson);
                     }
