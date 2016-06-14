@@ -97,7 +97,7 @@
                                   </Label>
                               </children>
                            </GridPane>
-                        <ImageView fx:id="faceImage" fitHeight="48.0" fitWidth="48.0" layoutX="181.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="6.0" AnchorPane.rightAnchor="466.0" AnchorPane.topAnchor="6.0" />
+                        <ImageView fx:id="face" fitHeight="48.0" fitWidth="48.0" layoutX="181.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" smooth="false" AnchorPane.bottomAnchor="6.0" AnchorPane.rightAnchor="466.0" AnchorPane.topAnchor="6.0" />
                        </children>
                     </AnchorPane>
                 </children>

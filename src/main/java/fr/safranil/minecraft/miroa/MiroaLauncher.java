@@ -17,7 +17,15 @@
  */
 package fr.safranil.minecraft.miroa;
 
+import com.sun.javafx.application.PlatformImpl;
 import fr.safranil.minecraft.mclauncherapi.OperatingSystemOverwritter;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+import net.minidev.json.parser.JSONParser;
+import org.apache.commons.codec.binary.Base64;
 import sk.tomsik68.mclauncher.api.common.IOperatingSystem;
 import sk.tomsik68.mclauncher.api.login.IProfile;
 import sk.tomsik68.mclauncher.api.login.ISession;
@@ -26,9 +34,12 @@ import sk.tomsik68.mclauncher.impl.login.legacy.LegacyProfile;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDAuthProfile;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDLoginService;
 import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDProfileIO;
+import sk.tomsik68.mclauncher.util.HttpUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 /**
@@ -110,6 +121,7 @@ class MiroaLauncher {
             io.write(profiles);
 
             loggedIn = true;
+            displayFace();
             return true;
         } catch (FileNotFoundException e) {
             System.out.println("Profile file does not exist.");
@@ -140,7 +152,63 @@ class MiroaLauncher {
         io.write(profiles);
 
         loggedIn = true;
+        displayFace();
         return true;
+    }
+
+    private void displayFace() {
+        try {
+            String sessionUrl = "https://sessionserver.mojang.com/session/minecraft/profile/"+session.getUUID();
+            String skinURL = null;
+            String sessionString = HttpUtils.httpGet(sessionUrl);
+            JSONObject sessionJSON = (JSONObject) JSONValue.parse(sessionString);
+            JSONArray properties = (JSONArray) sessionJSON.get("properties");
+
+            String propertyString = null;
+
+            for (Object rawProperty : properties) {
+                JSONObject property = (JSONObject) rawProperty;
+                if (property.containsKey("name") && "textures".equals(property.get("name"))) {
+                    if (property.containsKey("value")) {
+                        propertyString = new String(Base64.decodeBase64((String) property.get("value")));
+                    }
+                    break;
+                }
+            }
+
+            JSONObject tmpJSON = (JSONObject) JSONValue.parse(propertyString);
+            if (tmpJSON.containsKey("textures")) {
+                tmpJSON = (JSONObject) tmpJSON.get("textures");
+                if (tmpJSON.containsKey("SKIN")) {
+                    tmpJSON = (JSONObject) tmpJSON.get("SKIN");
+                    if (tmpJSON.containsKey("url")) {
+                        skinURL = (String) tmpJSON.get("url");
+                    }
+                }
+            }
+
+            if (skinURL != null) {
+                System.out.println("Found skin URL : ".concat(skinURL));
+            }
+            else {
+                System.out.println("No skin URL found !");
+                return;
+            }
+
+            Image skin = new Image(skinURL, 64*6, 32*6, false, false);
+            Image face = new WritableImage(skin.getPixelReader(), 8*6, 8*6, 8*6, 8*6);
+
+
+            PlatformImpl.runLater(() -> {
+                mainController.face.setVisible(true);
+                mainController.face.setImage(face);
+            });
+
+            /*InputStream is = new ByteArrayInputStream(imageString.getBytes());
+            Image image = new Image(is);*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -154,6 +222,8 @@ class MiroaLauncher {
         io.write(new IProfile[]{});
 
         loggedIn = false;
+
+        PlatformImpl.runLater(() -> mainController.face.setVisible(false));
     }
 
     /**
