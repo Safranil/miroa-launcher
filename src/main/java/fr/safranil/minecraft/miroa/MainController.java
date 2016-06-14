@@ -142,6 +142,7 @@ public class MainController {
                         progress.setVisible(false);
                         infoLabel.setText("");
                         loginPane.setOpacity(1);
+                        face.setOpacity(1);
                         infoPane.setVisible(false);
                     });
                 } else {
@@ -155,6 +156,7 @@ public class MainController {
                         progress.setProgress(-1);
                         infoLabel.setText("Veuillez patienter...");
                         loginPane.setOpacity(0.25);
+                        face.setOpacity(0.25);
                         infoPane.setVisible(true);
                     });
 
