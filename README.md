@@ -1,6 +1,8 @@
 Miroa Launcher
 ==============
 
+[![Join the chat at https://gitter.im/Safranil/miroa-launcher](https://badges.gitter.im/Safranil/miroa-launcher.svg)](https://gitter.im/Safranil/miroa-launcher?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Dependencies
 ------------
 
