@@ -32,11 +32,12 @@ class Starter extends Thread {
     @Override
     public void run() {
         try {
-            InetAddress inetAddress = InetAddress.getByName("authserver.mojang.com");
+            /*InetAddress inetAddress = InetAddress.getByName("authserver.mojang.com");
+            System.out.println("Mojang authserver at " + inetAddress.getHostAddress());
             if (!inetAddress.isReachable(10000)) {
                 Utils.displayError("Serveur indisponible", "Le serveur de connexion de Mojang est indisponible.", "La connexion au serveur de connexion est impossible. Verifiez votre connexion à Internet et réessayez.");
                 PlatformImpl.exit();
-            }
+            }*/
 
             MiroaLauncher launcher = MiroaLauncher.getInstance();
 
