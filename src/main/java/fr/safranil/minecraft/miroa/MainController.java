@@ -33,14 +33,20 @@ import javafx.scene.web.WebView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import sk.tomsik68.mclauncher.api.common.mc.MinecraftInstance;
+import sk.tomsik68.mclauncher.api.servers.ServerInfo;
 import sk.tomsik68.mclauncher.backend.MinecraftLauncherBackend;
 import sk.tomsik68.mclauncher.impl.common.Platform;
+import sk.tomsik68.mclauncher.impl.common.mc.VanillaServerStorage;
 import sk.tomsik68.mclauncher.util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Objects;
 
 public class MainController {
     @FXML
@@ -71,8 +77,13 @@ public class MainController {
     @FXML
     ImageView face;
 
+    public void onEnter() {
+        playButton.fire();
+    }
+
     public void setToPlay() {
         playButton.setText("Jouer");
+        playButton.requestFocus();
         loginField.setDisable(true);
         passwordField.setDisable(true);
         playButton.setDisable(false);
@@ -82,6 +93,7 @@ public class MainController {
     public void setToLogin() {
         playButton.setText("Connexion");
         loginField.setDisable(false);
+        loginField.requestFocus();
         passwordField.setDisable(false);
         playButton.setDisable(false);
         optionsButton.setDisable(false);
@@ -166,6 +178,8 @@ public class MainController {
                         Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(progress, subInfoLabel));
                         launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
+                        updateServers();
+
                         canLaunch = true;
                     } catch (Exception e) {
                         Utils.displayException("Erreur lors du téléchargement", "Une erreur c'est produite lors du téléchargement.", e);
@@ -191,19 +205,18 @@ public class MainController {
 
                             pb.directory(MiroaLauncher.OS.getWorkingDirectory());
 
-                            pb.redirectError(new File(MiroaLauncher.OS.getWorkingDirectory(), "minecraft.err.log"));
-                            pb.redirectOutput(new File(MiroaLauncher.OS.getWorkingDirectory(), "minecraft.out.log"));
+                            File logDir = new File(MiroaLauncher.OS.getWorkingDirectory(), "logs");
+                            org.apache.commons.io.FileUtils.forceMkdir(logDir);
+
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+                            String date = sdf.format(Calendar.getInstance().getTime());
+
+                            pb.redirectError(new File(logDir, "minecraft_"+date+".err.log"));
+                            pb.redirectOutput(new File(logDir, "minecraft_"+date+".out.log"));
 
                             Process p = pb.start();
-
-                            BufferedReader br = new BufferedReader(
-                                    new InputStreamReader(p.getInputStream()));
-                            String line;
-                            while (p.isAlive()) {
-                                line = br.readLine();
-                                if (line != null && line.length() > 0)
-                                    System.out.println(line);
-                            }
+                            p.waitFor();
+                        } catch (InterruptedException ignored) {
                         } catch (Exception e) {
                             Utils.displayException("Erreur lors du lancement", "Une erreur c'est produite lors du lancement du jeu.", e);
                         }
@@ -226,6 +239,35 @@ public class MainController {
         });
 
         t.start();
+    }
+
+    private void updateServers() {
+        MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.OS.getWorkingDirectory());
+        VanillaServerStorage serverStorage = new VanillaServerStorage(mc);
+        ServerInfo[] savedServers = new ServerInfo[0];
+
+        try {
+            savedServers = serverStorage.loadServers();
+        } catch (Exception ignored) {
+        }
+
+        try {
+            ServerInfo[] servers;
+            boolean addServer = true;
+            for (ServerInfo server : savedServers) {
+                if (Objects.equals(server.getIP(), MiroaLauncher.SERVER_IP) && server.getPort() == MiroaLauncher.SERVER_PORT) {
+                    addServer = false;
+                }
+            }
+            if (addServer) {
+                servers = new ServerInfo[savedServers.length + 1];
+                servers[0] = new ServerInfo(MiroaLauncher.SERVER_IP, "Miroa", null, MiroaLauncher.SERVER_PORT);
+                System.arraycopy(savedServers, 0, servers, 1, savedServers.length);
+                serverStorage.saveServers(servers);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void createForgeVersionFile() {

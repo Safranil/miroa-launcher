@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
  This file is part of Miroa Launcher.
  Copyright (C) 2016 David Cachau <dev@safranil.fr>
@@ -67,8 +68,8 @@
                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                                </rowConstraints>
                               <children>
-                                  <TextField id="1" fx:id="loginField" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" />
-                                  <PasswordField id="2" fx:id="passwordField" disable="true" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                  <TextField id="1" fx:id="loginField" disable="true" maxWidth="1.7976931348623157E308" onAction="#onEnter" GridPane.columnIndex="1" />
+                                  <PasswordField id="2" fx:id="passwordField" disable="true" maxWidth="1.7976931348623157E308" onAction="#onEnter" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                   <Button id="3" fx:id="playButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playAction" text="Connexion" GridPane.columnIndex="2" GridPane.rowIndex="1" />
                                   <Button id="4" fx:id="optionsButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#optionAction" text="Options" GridPane.columnIndex="2" />
                                   <Label alignment="CENTER_RIGHT" focusTraversable="false" text="Pseudo / Email : " GridPane.halignment="RIGHT" />

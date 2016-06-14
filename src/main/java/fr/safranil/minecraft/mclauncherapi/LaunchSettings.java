@@ -67,7 +67,6 @@ public class LaunchSettings implements ILaunchSettings {
     public List<String> getJavaArguments() {
         return Arrays
                 .asList("-XX:+UseConcMarkSweepGC",
-                        "-XX:+CMSIncrementalMode",
                         "-XX:-UseAdaptiveSizePolicy",
                         "-Xmn128M");
     }
