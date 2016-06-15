@@ -180,8 +180,8 @@ class Updater {
             for (int j = 0; j < uSize; j++) {
                 uJson = (JSONObject) local.get(i);
                 lJson = (JSONObject) update.get(j);
-                lStr = (String) uJson.get("name");
-                uStr = (String) lJson.get("name");
+                lStr = (String) lJson.get("name");
+                uStr = (String) uJson.get("name");
                 if (lStr.equals(uStr)) {
                     fis = null;
                     fStr = "";
@@ -201,12 +201,12 @@ class Updater {
                             }
                     }
 
-                    lStr = (String) ((JSONObject) update.get(i)).get("checksum");
+                    lStr = (String) ((JSONObject) local.get(i)).get("checksum");
                     uStr = (String) ((JSONObject) update.get(j)).get("checksum");
 
                     if (!lStr.equals(uStr) || !lStr.equals(fStr)) {
-                        fileToDelete.add(uJson);
-                        fileToDownload.add(lJson);
+                        fileToDelete.add(lJson);
+                        fileToDownload.add(uJson);
                     }
 
                     local.remove(i);
@@ -220,14 +220,12 @@ class Updater {
 
         lSize = local.size();
         for (int i = 0; i < lSize; i++) {
-            lJson = (JSONObject) local.get(i);
-            fileToDelete.add(lJson);
+            fileToDelete.add(local.get(i));
         }
 
         uSize = update.size();
         for (int i = 0; i < uSize; i++) {
-            uJson = (JSONObject) update.get(i);
-            fileToDelete.add(uJson);
+            fileToDelete.add(update.get(i));
         }
     }
 
