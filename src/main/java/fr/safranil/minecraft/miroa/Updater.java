@@ -225,7 +225,7 @@ class Updater {
 
         uSize = update.size();
         for (int i = 0; i < uSize; i++) {
-            fileToDelete.add(update.get(i));
+            fileToDownload.add(update.get(i));
         }
     }
 
