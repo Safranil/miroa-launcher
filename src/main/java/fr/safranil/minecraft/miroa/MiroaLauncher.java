@@ -37,15 +37,15 @@ import sk.tomsik68.mclauncher.impl.login.yggdrasil.YDProfileIO;
 import sk.tomsik68.mclauncher.util.HttpUtils;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 /**
  * Launcher class that do some work and store some info for the launcher
  */
 class MiroaLauncher {
+    static Logger LOGGER = Logger.getLogger(Updater.class.getName());
+
     static final IOperatingSystem OS = new OperatingSystemOverwritter(Platform.getCurrentPlatform());
 
     private static final String DEFAULT_MEMORY = "2048M";
@@ -54,8 +54,8 @@ class MiroaLauncher {
     static final String FORGE_VERSION = "1.7.10-Forge10.13.4.1614-1.7.10";
 
     private static final String DEFAULT_JAVA = getDefaultJava();
-    public static final String SERVER_IP = "mc.safranil.fr";
-    public static final int SERVER_PORT = 25565;
+    static final String SERVER_IP = "mc.safranil.fr";
+    static final int SERVER_PORT = 25565;
 
     MainController mainController;
 
@@ -101,9 +101,10 @@ class MiroaLauncher {
 
     /**
      * Do the login work
-     * @return authenticated via the Mojang service
+     * @return true when authenticated via the Mojang service
      */
     boolean login() {
+        MiroaLauncher.LOGGER.info("Trying reusing previous token");
         try {
             YDLoginService loginService = new YDLoginService();
             YDProfileIO io = new YDProfileIO(Platform.getCurrentPlatform().getWorkingDirectory());
@@ -115,16 +116,18 @@ class MiroaLauncher {
                 session = loginService.login(profiles[0]);
             }
             else {
+                MiroaLauncher.LOGGER.info("No profile found");
                 return false;
             }
 
             io.write(profiles);
 
+            MiroaLauncher.LOGGER.info("Authenticated via a previous token");
             loggedIn = true;
             displayFace();
             return true;
         } catch (FileNotFoundException e) {
-            System.out.println("Profile file does not exist.");
+            MiroaLauncher.LOGGER.info("Profile file does not exist");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -157,6 +160,7 @@ class MiroaLauncher {
     }
 
     private void displayFace() {
+        MiroaLauncher.LOGGER.info("Try to display the player face");
         try {
             String sessionUrl = "https://sessionserver.mojang.com/session/minecraft/profile/"+session.getUUID();
             String skinURL = null;
@@ -166,6 +170,7 @@ class MiroaLauncher {
 
             String propertyString = null;
 
+            MiroaLauncher.LOGGER.info("Getting player properties");
             for (Object rawProperty : properties) {
                 JSONObject property = (JSONObject) rawProperty;
                 if (property.containsKey("name") && "textures".equals(property.get("name"))) {
@@ -176,6 +181,7 @@ class MiroaLauncher {
                 }
             }
 
+            MiroaLauncher.LOGGER.info("Getting player skin URL");
             JSONObject tmpJSON = (JSONObject) JSONValue.parse(propertyString);
             if (tmpJSON.containsKey("textures")) {
                 tmpJSON = (JSONObject) tmpJSON.get("textures");
@@ -188,25 +194,23 @@ class MiroaLauncher {
             }
 
             if (skinURL != null) {
-                System.out.println("Found skin URL : ".concat(skinURL));
+                MiroaLauncher.LOGGER.info("Found skin URL : ".concat(skinURL));
             }
             else {
-                System.out.println("No skin URL found !");
+                MiroaLauncher.LOGGER.warning("No skin URL found");
                 return;
             }
 
             Image skin = new Image(skinURL, 64*6, 32*6, false, false);
             Image face = new WritableImage(skin.getPixelReader(), 8*6, 8*6, 8*6, 8*6);
 
-
+            MiroaLauncher.LOGGER.info("Displaying the player face");
             PlatformImpl.runLater(() -> {
                 mainController.face.setVisible(true);
                 mainController.face.setImage(face);
             });
-
-            /*InputStream is = new ByteArrayInputStream(imageString.getBytes());
-            Image image = new Image(is);*/
         } catch (Exception e) {
+            MiroaLauncher.LOGGER.warning("Unable to display the player face");
             e.printStackTrace();
         }
     }
@@ -222,6 +226,7 @@ class MiroaLauncher {
         io.write(new IProfile[]{});
 
         loggedIn = false;
+        MiroaLauncher.LOGGER.info("User is now logged out");
 
         PlatformImpl.runLater(() -> mainController.face.setVisible(false));
     }

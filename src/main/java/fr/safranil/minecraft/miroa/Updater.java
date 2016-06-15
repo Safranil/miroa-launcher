@@ -94,11 +94,14 @@ class Updater {
             Integer size = (Integer) json.get("size");
             File destFile = new File(tempDir, file);
 
+            // Check if file destination is outside the Miroa working directory
             if (!destFile.getAbsolutePath().startsWith(minecraft.getAbsolutePath())) {
                 log.severe("Unsafe modification detected, the directory is outside of the launcher for ".concat(file));
                 throw new Exception("Update file contain unsafe modification, aborting process !");
             }
 
+            // If the file exist, check if the downloaded version is correct
+            // Useful when the launcher has been closed when updating content
             if (destFile.exists()) {
                 log.fine("File ".concat(file).concat(" exist, checking content"));
                 FileInputStream fis = new FileInputStream(destFile);
@@ -112,19 +115,32 @@ class Updater {
                 }
             }
 
+            // Download all missing file in the temporary download directory
             log.info("Downloading file at ".concat(url));
             progress.setStatus("Downloading ".concat(file));
             sk.tomsik68.mclauncher.util.FileUtils.downloadFileWithProgress(url, destFile, progress);
         }
 
+        // Delete all unwanted files
         deleteFiles(fileToDelete, minecraft);
+
+        // Write the updated package data
+        sk.tomsik68.mclauncher.util.FileUtils.writeFile(localFile, jsonString);
+
+        // Move all downloaded files
         moveFiles(fileToDownload, tempDir, minecraft);
 
+        // Delete the tmp dir when the launcher exit
         FileUtils.forceDeleteOnExit(tempDir);
-
-        sk.tomsik68.mclauncher.util.FileUtils.writeFile(localFile, jsonString);
     }
 
+    /**
+     * Move all downloaded file in there final destination
+     * @param fileToMove All file to move
+     * @param tempDir Download working directory
+     * @param ws Miroa working directory
+     * @throws Exception
+     */
     private static void moveFiles(JSONArray fileToMove, File tempDir, File ws) throws Exception {
         File src, dst;
         for (Object aFileToMove : fileToMove) {
@@ -146,6 +162,12 @@ class Updater {
 
     }
 
+    /**
+     * Delete each file in the array
+     * @param fileToDelete All file to delete
+     * @param ws The Miroa working directory
+     * @throws IOException
+     */
     private static void deleteFiles(JSONArray fileToDelete, File ws) throws IOException {
         for (Object aFileToDelete : fileToDelete) {
             JSONObject json = (JSONObject) aFileToDelete;
@@ -162,7 +184,7 @@ class Updater {
     }
 
     /**
-     * Compare the local and remote package informations
+     * Compare the local and remote package data
      * @param local local json
      * @param update remote json
      * @param fileToDelete all file to delete array
@@ -174,6 +196,7 @@ class Updater {
         FileInputStream fis;
         int lSize, uSize;
 
+        // Compare local and update array
         lSize = local.size();
         for (int i = 0; i < lSize; i++) {
             uSize = update.size();
@@ -182,9 +205,12 @@ class Updater {
                 lJson = (JSONObject) update.get(j);
                 lStr = (String) lJson.get("name");
                 uStr = (String) uJson.get("name");
+
+                // If the same file name is found
                 if (lStr.equals(uStr)) {
                     fis = null;
                     fStr = "";
+                    // Get the local file hash
                     try {
                         fis = new FileInputStream(new File(ws, lStr));
                         fStr = DigestUtils.sha1Hex(fis);
@@ -204,11 +230,13 @@ class Updater {
                     lStr = (String) ((JSONObject) local.get(i)).get("checksum");
                     uStr = (String) ((JSONObject) update.get(j)).get("checksum");
 
+                    // If hashes are incorrect, download the file and remove the local file
                     if (!lStr.equals(uStr) || !lStr.equals(fStr)) {
                         fileToDelete.add(lJson);
                         fileToDownload.add(uJson);
                     }
 
+                    // Remove found file from arrays
                     local.remove(i);
                     update.remove(j);
                     i--;
@@ -218,11 +246,13 @@ class Updater {
             }
         }
 
+        // For each local file remaining delete them
         lSize = local.size();
         for (int i = 0; i < lSize; i++) {
             fileToDelete.add(local.get(i));
         }
 
+        // For each file remaining in the download list, set to download them
         uSize = update.size();
         for (int i = 0; i < uSize; i++) {
             fileToDownload.add(update.get(i));

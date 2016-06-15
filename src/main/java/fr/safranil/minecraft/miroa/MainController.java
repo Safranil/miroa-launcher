@@ -40,10 +40,8 @@ import sk.tomsik68.mclauncher.impl.common.Platform;
 import sk.tomsik68.mclauncher.impl.common.mc.VanillaServerStorage;
 import sk.tomsik68.mclauncher.util.FileUtils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Objects;
@@ -82,6 +80,7 @@ public class MainController {
     }
 
     public void setToPlay() {
+        MiroaLauncher.LOGGER.info("Gui setting up to play");
         playButton.setText("Jouer");
         playButton.requestFocus();
         loginField.setDisable(true);
@@ -91,6 +90,7 @@ public class MainController {
     }
 
     public void setToLogin() {
+        MiroaLauncher.LOGGER.info("Gui setting up to login");
         playButton.setText("Connexion");
         loginField.setDisable(false);
         loginField.requestFocus();
@@ -101,11 +101,13 @@ public class MainController {
 
     @FXML
     public void playAction() {
+        MiroaLauncher.LOGGER.info("Play button pressed, starting Task thread");
         Thread t = new Thread(new Task<Void>() {
             @Override
             public Void call() {
                 // Display login form
                 if (!MiroaLauncher.getInstance().isLoggedIn()) {
+                    MiroaLauncher.LOGGER.info("User not logged");
                     PlatformImpl.runAndWait(() -> {
                         playButton.setDisable(true);
                         optionsButton.setDisable(true);
@@ -120,20 +122,15 @@ public class MainController {
 
                     MiroaLauncher launcher = MiroaLauncher.getInstance();
 
+                    MiroaLauncher.LOGGER.info("Authenticate user through Mojang server");
                     try {
                         launcher.login(loginField.getText(), passwordField.getText());
                         PlatformImpl.runAndWait(() -> setToPlay());
+                        MiroaLauncher.LOGGER.info("User ".concat(launcher.getUsername()).concat(" is now authenticated"));
                     } catch (Exception e) {
+                        MiroaLauncher.LOGGER.warning("Exception thrown when authenticating : ".concat(e.getMessage()));
                         e.printStackTrace();
-
-                        PlatformImpl.runAndWait(() -> {
-                            Alert error = new Alert(Alert.AlertType.ERROR);
-                            error.setTitle("Erreur lors de l'authentification");
-                            error.setHeaderText("Erreur lors de l'authentification.");
-                            error.setContentText(String.format("ErrorMessage : %s", e.getMessage()));
-                            error.showAndWait();
-                            setToLogin();
-                        });
+                        Utils.displayError("Erreur lors de l'authentification", "ErrorMessage : ".concat(e.getMessage()));
                     }
 
                     PlatformImpl.runAndWait(() -> {
@@ -146,6 +143,7 @@ public class MainController {
                         infoPane.setVisible(false);
                     });
                 } else {
+                    MiroaLauncher.LOGGER.info("User logged in");
                     PlatformImpl.runAndWait(() -> {
                         playButton.setDisable(true);
                         optionsButton.setDisable(true);
@@ -167,6 +165,7 @@ public class MainController {
 
                     boolean canLaunch = false;
                     try {
+                        MiroaLauncher.LOGGER.info("Installing Minecraft");
                         PlatformImpl.runAndWait(() -> infoLabel.setText("Installation de Minecraft..."));
                         launcherBackend.updateMinecraft(MiroaLauncher.MC_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
@@ -177,17 +176,22 @@ public class MainController {
                             progress.setProgress(-1);
                         });
 
+                        MiroaLauncher.LOGGER.info("Installing Forge and mods");
                         Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(progress, subInfoLabel));
+                        MiroaLauncher.LOGGER.info("Installing Forge missing libraries");
                         launcherBackend.updateMinecraft(MiroaLauncher.FORGE_VERSION, new InstallProgressMonitor(progress, subInfoLabel));
 
                         updateServers();
 
                         canLaunch = true;
                     } catch (Exception e) {
+                        MiroaLauncher.LOGGER.severe("Error when downloading updates");
+                        e.printStackTrace();
                         Utils.displayException("Erreur lors du téléchargement", "Une erreur c'est produite lors du téléchargement.", e);
                     }
 
                     if (canLaunch) {
+                        MiroaLauncher.LOGGER.info("Starting Minecraft");
                         try {
                             PlatformImpl.runAndWait(() -> {
                                 infoLabel.setText("Lancement du jeu");
@@ -195,6 +199,10 @@ public class MainController {
                                 progress.setStyle(" -fx-progress-color: royalblue;");
                                 progress.setProgress(-1);
                             });
+
+                            MiroaLauncher.LOGGER.info("Memory setting : "+launcher.getMemory());
+                            MiroaLauncher.LOGGER.info("Java setting : "+launcher.getJavaBin());
+
                             ProcessBuilder pb = launcherBackend.launchMinecraft(
                                     launcher.session,
                                     null,
@@ -216,10 +224,15 @@ public class MainController {
                             pb.redirectError(new File(logDir, "minecraft_"+date+".err.log"));
                             pb.redirectOutput(new File(logDir, "minecraft_"+date+".out.log"));
 
+                            MiroaLauncher.LOGGER.info("Minecraft log can be found in logs/minecraft_"+date+".*.log");
+
                             Process p = pb.start();
+                            MiroaLauncher.LOGGER.info("Process started");
                             p.waitFor();
                         } catch (InterruptedException ignored) {
                         } catch (Exception e) {
+                            MiroaLauncher.LOGGER.severe("Error when launching Minecraft");
+                            e.printStackTrace();
                             Utils.displayException("Erreur lors du lancement", "Une erreur c'est produite lors du lancement du jeu.", e);
                         }
                     }
@@ -244,6 +257,7 @@ public class MainController {
     }
 
     private void updateServers() {
+        MiroaLauncher.LOGGER.info("Updating server list");
         MinecraftInstance mc = new MinecraftInstance(MiroaLauncher.OS.getWorkingDirectory());
         VanillaServerStorage serverStorage = new VanillaServerStorage(mc);
         ServerInfo[] savedServers = new ServerInfo[0];
@@ -255,38 +269,44 @@ public class MainController {
 
         try {
             ServerInfo[] servers;
-            boolean addServer = true;
+
             for (ServerInfo server : savedServers) {
                 if (Objects.equals(server.getIP(), MiroaLauncher.SERVER_IP) && server.getPort() == MiroaLauncher.SERVER_PORT) {
-                    addServer = false;
+                    MiroaLauncher.LOGGER.info("Server already exist");
+                    return;
                 }
             }
-            if (addServer) {
-                servers = new ServerInfo[savedServers.length + 1];
-                servers[0] = new ServerInfo(MiroaLauncher.SERVER_IP, "Miroa", null, MiroaLauncher.SERVER_PORT);
-                System.arraycopy(savedServers, 0, servers, 1, savedServers.length);
-                serverStorage.saveServers(servers);
-            }
+
+            MiroaLauncher.LOGGER.info("Adding Miroa server");
+            servers = new ServerInfo[savedServers.length + 1];
+            servers[0] = new ServerInfo(MiroaLauncher.SERVER_IP, "Miroa", null, MiroaLauncher.SERVER_PORT);
+            System.arraycopy(savedServers, 0, servers, 1, savedServers.length);
+            serverStorage.saveServers(servers);
         } catch (Exception e) {
+            MiroaLauncher.LOGGER.info("Unable to update server list");
             e.printStackTrace();
         }
     }
 
     private void createForgeVersionFile() {
-
         File forgeVersion = new File(MiroaLauncher.OS.getWorkingDirectory(), "versions/" + MiroaLauncher.FORGE_VERSION + "/" + MiroaLauncher.FORGE_VERSION + ".json");
         if (!forgeVersion.exists()) {
+            MiroaLauncher.LOGGER.info("Creating missing forge version file");
             try {
                 FileUtils.createFileSafely(forgeVersion);
                 org.apache.commons.io.FileUtils.copyURLToFile(getClass().getResource("forgeVersion.json"), forgeVersion);
             } catch (Exception e) {
+                MiroaLauncher.LOGGER.severe("Unable to add Forge version file");
                 e.printStackTrace();
+                Utils.displayException("Installation impossible", "Impossible de créer le fichier de version de Forge.", e);
+                PlatformImpl.exit();
             }
         }
     }
 
     @FXML
     public void optionAction() {
+        MiroaLauncher.LOGGER.info("Opening options GUI");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("option.fxml"));
             Parent root = loader.load();
@@ -296,12 +316,15 @@ public class MainController {
             stage.initStyle(StageStyle.UNDECORATED);
             stage.setTitle("Options");
             stage.setScene(new Scene(root));
+            MiroaLauncher.LOGGER.info("Showing options GUI");
             stage.show();
 
             OptionController controller = loader.getController();
             controller.prepareOptions();
         } catch (IOException e) {
+            MiroaLauncher.LOGGER.severe("Unable to show Option GUI");
             e.printStackTrace();
+            Utils.displayException("Erreur interface", "Impossible d'afficher les options.", e);
         }
     }
 }

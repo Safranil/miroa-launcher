@@ -52,21 +52,22 @@ public class OptionController {
 
     @FXML
     public void saveAction() {
+        MiroaLauncher.LOGGER.info("Saving options");
         MiroaLauncher launcher = MiroaLauncher.getInstance();
 
         if (launcher.checkJavaBin(javaField.getText())) {
             launcher.setJavaBin(javaField.getText());
             launcher.setMemory(memoryChoice.getValue().getJavaOption());
 
+            MiroaLauncher.LOGGER.info("Options saved");
             closeAction();
         }
         else {
-            Alert error = new Alert(Alert.AlertType.ERROR);
-            error.setTitle("Erreur chemin vers Java");
-            error.setHeaderText("L'exécutable Java spécifié est introuvable ou n'est pas exécutable.");
-            error.setContentText("Vérifiez que vous avez spécifier le bon chemin de Java, par exemple :\n" +
-                    "C:\\Program Files\\Java\\jre1.8.0_92\\bin\\java.exe");
-            error.showAndWait();
+            MiroaLauncher.LOGGER.info("Invalid options, not saved");
+            Utils.displayError("Erreur chemin vers Java",
+                    "L'exécutable Java spécifié est introuvable ou n'est pas exécutable.",
+                    "Vérifiez que vous avez spécifier le bon chemin de Java, par exemple :\n" +
+                        "C:\\Program Files\\Java\\jre1.8.0_92\\bin\\java.exe");
         }
     }
 
@@ -76,7 +77,9 @@ public class OptionController {
         try {
             launcher.logout();
         } catch (Exception e) {
+            MiroaLauncher.LOGGER.info("Error when log out");
             e.printStackTrace();
+            Utils.displayException("Deconnexion impossible", "Une erreur est survenue lors de la déconnexion.", e);
         }
         launcher.mainController.setToLogin();
         logoutButton.setDisable(true);

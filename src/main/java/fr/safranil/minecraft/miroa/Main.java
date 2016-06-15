@@ -24,6 +24,9 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 @SuppressWarnings("WeakerAccess")
 public class Main extends Application {
     static Scene mainScene;
@@ -31,6 +34,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        MiroaLauncher.LOGGER.info("Starting Miroa launcher...");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+        MiroaLauncher.LOGGER.info("Local time is ".concat(sdf.format(Calendar.getInstance().getTime())));
+
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         AnchorPane root = loader.load();
         primaryStage.setTitle("Miroa");
@@ -42,6 +49,7 @@ public class Main extends Application {
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft128.png")));
         primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("minecraft256.png")));
 
+        MiroaLauncher.LOGGER.info("Showing the scene...");
         primaryStage.setScene(new Scene(root, 750, 450));
         primaryStage.show();
         primaryStage.setMinHeight(primaryStage.getHeight());
@@ -58,6 +66,7 @@ public class Main extends Application {
         controller.loading.setVisible(true);
 
         // Do some work in a separate thread
+        MiroaLauncher.LOGGER.info("Running Starter thread...");
         Thread t = new Starter();
         t.start();
     }

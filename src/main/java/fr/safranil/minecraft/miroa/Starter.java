@@ -50,6 +50,7 @@ class Starter extends Thread {
             }
 
             if (!MiroaLauncher.OS.getWorkingDirectory().canRead() || !MiroaLauncher.OS.getWorkingDirectory().canWrite() || !MiroaLauncher.OS.getWorkingDirectory().isDirectory()) {
+                MiroaLauncher.LOGGER.severe("Unable to read/write on game directory");
                 Utils.displayError("Erreur dossier de jeu", "Le dossier de stockage n'est pas accessible.", String.format(
                         "canRead : %s\ncanWrite : %s\nisDirectory : %s",
                         MiroaLauncher.OS.getWorkingDirectory().canRead(),
@@ -75,6 +76,8 @@ class Starter extends Thread {
 
             PlatformImpl.runLater(() -> launcher.mainController.loading.setVisible(false));
         } catch (Exception e) {
+            MiroaLauncher.LOGGER.info("Unable to start the launcher");
+            e.printStackTrace();
             Utils.displayException("Impossible de lancer le launcher",
                     "Une erreur est survenue lors du lancement du launcher.", e);
             PlatformImpl.exit();
