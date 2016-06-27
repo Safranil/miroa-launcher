@@ -318,9 +318,6 @@ public class MainController {
             stage.setScene(new Scene(root));
             MiroaLauncher.LOGGER.info("Showing options GUI");
             stage.show();
-
-            OptionController controller = loader.getController();
-            controller.prepareOptions();
         } catch (IOException e) {
             MiroaLauncher.LOGGER.severe("Unable to show Option GUI");
             e.printStackTrace();

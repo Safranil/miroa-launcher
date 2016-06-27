@@ -19,14 +19,16 @@ package fr.safranil.minecraft.miroa;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 
 public class OptionController {
     @FXML
@@ -42,8 +44,74 @@ public class OptionController {
     @FXML
     Button logoutButton;
 
+    @FXML
+    Hyperlink hyperlinkLog;
+    @FXML
+    Hyperlink hyperlinkLauncher;
+    @FXML
+    Hyperlink hyperlinkWebsite;
 
-    @SuppressWarnings("WeakerAccess")
+    @FXML
+    public void initialize() {
+        MiroaLauncher.LOGGER.info("Initializing option controller");
+        MiroaLauncher launcher = MiroaLauncher.getInstance();
+
+        memoryChoice.setItems(FXCollections.observableArrayList(MiroaLauncher.memoryOptions));
+
+        for (MemoryOption memory : MiroaLauncher.memoryOptions) {
+            if (memory.getJavaOption().equals(launcher.getMemory())) {
+                memoryChoice.setValue(memory);
+                break;
+            }
+        }
+
+        if (memoryChoice.getValue() == null) {
+            memoryChoice.setValue(MiroaLauncher.memoryOptions.get(MiroaLauncher.DEFAULT_MEMORY_ID));
+        }
+
+        if (launcher.isLoggedIn()) {
+            logoutButton.setVisible(true);
+        } else {
+            logoutButton.setVisible(false);
+        }
+
+        javaField.setText(launcher.getJavaBin());
+
+        if (!Desktop.isDesktopSupported()) {
+            MiroaLauncher.LOGGER.info("Disabling hyperlinks, desktop is not supported");
+            hyperlinkLauncher.setDisable(true);
+            hyperlinkLog.setDisable(true);
+            hyperlinkWebsite.setDisable(true);
+        }
+    }
+
+    @FXML
+    public void openWebsite () {
+        try {
+            Desktop.getDesktop().browse(URI.create("http://minecraft.safranil.fr/"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void openLog () {
+        try {
+            Desktop.getDesktop().open(new File(MiroaLauncher.OS.getWorkingDirectory(), "logs"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void openLauncherDir () {
+        try {
+            Desktop.getDesktop().open(MiroaLauncher.OS.getWorkingDirectory());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     public void closeAction() {
         Stage stage = (Stage) cancelButton.getScene().getWindow();
@@ -104,28 +172,4 @@ public class OptionController {
         }
     }
 
-    void prepareOptions() {
-        MiroaLauncher launcher = MiroaLauncher.getInstance();
-
-        memoryChoice.setItems(FXCollections.observableArrayList(MiroaLauncher.memoryOptions));
-
-        for (MemoryOption memory : MiroaLauncher.memoryOptions) {
-            if (memory.getJavaOption().equals(launcher.getMemory())) {
-                memoryChoice.setValue(memory);
-                break;
-            }
-        }
-
-        if (memoryChoice.getValue() == null) {
-            memoryChoice.setValue(MiroaLauncher.memoryOptions.get(MiroaLauncher.DEFAULT_MEMORY_ID));
-        }
-
-        if (launcher.isLoggedIn()) {
-            logoutButton.setVisible(true);
-        } else {
-            logoutButton.setVisible(false);
-        }
-
-        javaField.setText(launcher.getJavaBin());
-    }
 }
