@@ -8,6 +8,12 @@ Dependencies
 
  * MC Launcher API : https://github.com/tomsik68/mclauncher-api
 
+Java Requirements
+-----------------
+
+ * Oracle Java 8
+ * OpenJDK **with** Java FX support
+
 Licence
 -------
 
