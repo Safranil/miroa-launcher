@@ -45,7 +45,7 @@ class Utils {
             alert.setTitle(title);
             alert.setHeaderText(header);
             alert.setContentText(content +
-                    "\nVous pouvez reporter cette erreur par mail à dev@safranil.fr avec le contenu de la boite ci-dessous (Afficher les détails pour voir la boite).");
+                    "\nVous pouvez reporter cette erreur à l'adresse http://minecraft.safranil.fr/rapport-de-bug avec le contenu de la boite ci-dessous (Afficher les détails pour voir la boite).");
 
             // Create the exception area
             TextArea textArea = new TextArea(ExceptionUtils.getStackTrace(throwable));

@@ -211,8 +211,6 @@ public class MainController {
                                     null
                             );
 
-                            PlatformImpl.runLater(() -> Main.mainStage.hide());
-
                             pb.directory(MiroaLauncher.OS.getWorkingDirectory());
 
                             File logDir = new File(MiroaLauncher.OS.getWorkingDirectory(), "logs");
@@ -221,14 +219,44 @@ public class MainController {
                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
                             String date = sdf.format(Calendar.getInstance().getTime());
 
-                            pb.redirectError(new File(logDir, "minecraft_"+date+".err.log"));
-                            pb.redirectOutput(new File(logDir, "minecraft_"+date+".out.log"));
+                            File errLog = new File(logDir, "minecraft_"+date+".err.log");
+                            File outLog = new File(logDir, "minecraft_"+date+".out.log");
+
+                            pb.redirectError(errLog);
+                            pb.redirectOutput(outLog);
 
                             MiroaLauncher.LOGGER.info("Minecraft log can be found in logs/minecraft_"+date+".*.log");
 
                             Process p = pb.start();
                             MiroaLauncher.LOGGER.info("Process started");
-                            p.waitFor();
+                            PlatformImpl.runAndWait(() -> {
+                                infoLabel.setText("Jeu lancé");
+                                progress.setProgress(1);
+                            });
+
+                            Thread.sleep(3000);
+                            PlatformImpl.runAndWait(() -> {
+                                Main.mainStage.hide();
+                            });
+
+                            int returnCode = p.waitFor();
+                            if (returnCode != 0 || true) {
+                                MiroaLauncher.LOGGER.severe("Minecraft return code is "+returnCode+", starting crash handler");
+                                PlatformImpl.runAndWait(() -> Main.mainStage.show());
+                                CrashHandler crashHandler = new CrashHandler(
+                                        "miroa_crash_".concat(date).concat(".zip"),
+                                        outLog,
+                                        errLog,
+                                        new File(MiroaLauncher.OS.getWorkingDirectory(), "launcher.log"),
+                                        new File(logDir, "latest.log"),
+                                        new File(logDir, "fml-client-latest.log")
+                                );
+                                crashHandler.displayMessage();
+                            }
+                            else {
+                                MiroaLauncher.LOGGER.info("Minecraft return code is 0, exiting launcher");
+                                PlatformImpl.exit();
+                            }
                         } catch (InterruptedException ignored) {
                         } catch (Exception e) {
                             MiroaLauncher.LOGGER.severe("Error when launching Minecraft");
@@ -245,6 +273,7 @@ public class MainController {
                         infoLabel.setText("");
                         subInfoLabel.setText("");
                         loginPane.setOpacity(1);
+                        face.setOpacity(1);
                         infoPane.setVisible(false);
                     });
                 }

@@ -19,6 +19,7 @@ package fr.safranil.minecraft.miroa;
 
 import com.sun.javafx.application.PlatformImpl;
 import fr.safranil.minecraft.mclauncherapi.OperatingSystemOverwritter;
+import javafx.application.HostServices;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import net.minidev.json.JSONArray;

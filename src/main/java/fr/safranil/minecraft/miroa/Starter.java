@@ -39,6 +39,8 @@ class Starter extends Thread {
                 PlatformImpl.exit();
             }*/
 
+            PlatformImpl.setImplicitExit(false);
+
             MiroaLauncher launcher = MiroaLauncher.getInstance();
 
             if (MiroaLauncher.OS.getWorkingDirectory().isFile()) {

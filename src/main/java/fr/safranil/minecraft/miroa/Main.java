@@ -18,6 +18,7 @@
 package fr.safranil.minecraft.miroa;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -31,6 +32,7 @@ import java.util.Calendar;
 public class Main extends Application {
     static Scene mainScene;
     static Stage mainStage;
+    static HostServices hostServices;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -58,6 +60,7 @@ public class Main extends Application {
 
         Main.mainScene = primaryStage.getScene();
         Main.mainStage = primaryStage;
+        Main.hostServices = getHostServices();
 
         MainController controller = loader.getController();
         MiroaLauncher launcher = MiroaLauncher.getInstance();
