@@ -17,6 +17,7 @@
  */
 package fr.safranil.minecraft.miroa;
 
+import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -76,40 +77,21 @@ public class OptionController {
         }
 
         javaField.setText(launcher.getJavaBin());
-
-        if (!Desktop.isDesktopSupported()) {
-            MiroaLauncher.LOGGER.info("Disabling hyperlinks, desktop is not supported");
-            hyperlinkLauncher.setDisable(true);
-            hyperlinkLog.setDisable(true);
-            hyperlinkWebsite.setDisable(true);
-        }
     }
 
     @FXML
     public void openWebsite () {
-        try {
-            Desktop.getDesktop().browse(URI.create("http://minecraft.safranil.fr/"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Main.hostServices.showDocument("http://minecraft.safranil.fr/");
     }
 
     @FXML
     public void openLog () {
-        try {
-            Desktop.getDesktop().open(new File(MiroaLauncher.OS.getWorkingDirectory(), "logs"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Main.hostServices.showDocument((new File(MiroaLauncher.OS.getWorkingDirectory(), "logs")).getAbsolutePath());
     }
 
     @FXML
     public void openLauncherDir () {
-        try {
-            Desktop.getDesktop().open(MiroaLauncher.OS.getWorkingDirectory());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Main.hostServices.showDocument(MiroaLauncher.OS.getWorkingDirectory().getAbsolutePath());
     }
 
     @FXML
