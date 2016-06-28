@@ -25,6 +25,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.apache.commons.io.FileUtils;
 
 import java.awt.*;
 import java.io.File;
@@ -44,13 +45,6 @@ public class OptionController {
     TextField javaField;
     @FXML
     Button logoutButton;
-
-    @FXML
-    Hyperlink hyperlinkLog;
-    @FXML
-    Hyperlink hyperlinkLauncher;
-    @FXML
-    Hyperlink hyperlinkWebsite;
 
     @FXML
     public void initialize() {
@@ -92,6 +86,30 @@ public class OptionController {
     @FXML
     public void openLauncherDir () {
         Main.hostServices.showDocument(MiroaLauncher.OS.getWorkingDirectory().getAbsolutePath());
+    }
+
+    @FXML
+    public void removeLog () {
+        try {
+            FileUtils.deleteDirectory(new File(MiroaLauncher.OS.getWorkingDirectory(), "logs"));
+        } catch (IOException e) {
+            MiroaLauncher.LOGGER.info("Error when removing log files");
+            e.printStackTrace();
+            Utils.displayException("Suppression impossible", "Une erreur est survenue lors de la suppression.", e);
+        }
+    }
+
+    @FXML
+    public void removeLauncher () {
+        for(File file : MiroaLauncher.OS.getWorkingDirectory().listFiles()) {
+            String name = file.getName();
+            if (!name.equals("saves") &&
+                    !name.equals("launcher_profiles.json") &&
+                    !name.equals("server.dat") &&
+                    !name.equals("launcher.jar")) {
+                FileUtils.deleteQuietly(file);
+            }
+        }
     }
 
     @FXML

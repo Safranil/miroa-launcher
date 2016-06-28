@@ -22,7 +22,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="301.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.safranil.minecraft.miroa.OptionController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="344.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.safranil.minecraft.miroa.OptionController">
     <top>
         <Pane maxHeight="20.0" minHeight="20.0" prefHeight="20.0" BorderPane.alignment="CENTER" />
     </top>
@@ -56,10 +56,11 @@
                    <Label text="Option de mémoire pour Java :" />
                    <ChoiceBox fx:id="memoryChoice" maxWidth="1.7976931348623157E308" />
             <Pane layoutX="10.0" layoutY="57.0" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" />
-            <Hyperlink fx:id="hyperlinkLog" onAction="#openLog" text="Ouvrir le repertoire des logs" />
-            <Hyperlink fx:id="hyperlinkLauncher" onAction="#openLauncherDir" text="Ouvrir le repertoire du launcher" />
-            <Hyperlink fx:id="hyperlinkWebsite" onAction="#openWebsite" text="Ouvrir le site internet dans le navigateur web" />
-                   <Pane maxHeight="30.0" minHeight="30.0" prefHeight="30.0" />
+            <Hyperlink onAction="#openLog" text="Ouvrir le repertoire des logs" />
+            <Hyperlink onAction="#openLauncherDir" text="Ouvrir le repertoire du launcher" />
+            <Hyperlink onAction="#openWebsite" text="Ouvrir le site internet dans le navigateur web" />
+            <Hyperlink layoutX="10.0" layoutY="185.0" onAction="#removeLog" text="Supprimer tous les logs" />
+            <Hyperlink layoutX="10.0" layoutY="198.0" onAction="#removeLauncher" text="Supprimer tous les fichiers du launcher (sauf mondes)" />
                    <GridPane>
                        <columnConstraints>
                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -69,12 +70,14 @@
                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                        </columnConstraints>
                        <rowConstraints>
-                           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           <RowConstraints />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                        </rowConstraints>
                       <children>
-                              <Button fx:id="cancelButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#closeAction" text="Annuler" GridPane.columnIndex="1" />
-                              <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveAction" text="Enregistrer" GridPane.columnIndex="3" />
-                              <Button fx:id="logoutButton" maxWidth="100.0" minWidth="100.0" mnemonicParsing="false" onAction="#logoutAction" prefWidth="100.0" text="Déconnexion" GridPane.columnIndex="4" GridPane.halignment="RIGHT" />
+                              <Button fx:id="cancelButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#closeAction" text="Annuler" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <Button fx:id="saveButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveAction" text="Enregistrer" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                              <Button fx:id="logoutButton" maxWidth="100.0" minWidth="100.0" mnemonicParsing="false" onAction="#logoutAction" prefWidth="100.0" text="Déconnexion" GridPane.columnIndex="4" GridPane.halignment="RIGHT" GridPane.rowIndex="1" />
+                         <Pane maxHeight="30.0" minHeight="30.0" prefHeight="30.0" GridPane.columnIndex="4" />
                       </children>
                    </GridPane>
            </children>

@@ -240,7 +240,7 @@ public class MainController {
                             });
 
                             int returnCode = p.waitFor();
-                            if (returnCode != 0 || true) {
+                            if (returnCode != 0) {
                                 MiroaLauncher.LOGGER.severe("Minecraft return code is "+returnCode+", starting crash handler");
                                 PlatformImpl.runAndWait(() -> Main.mainStage.show());
                                 CrashHandler crashHandler = new CrashHandler(
