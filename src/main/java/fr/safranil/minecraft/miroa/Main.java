@@ -39,6 +39,7 @@ public class Main extends Application {
         MiroaLauncher.LOGGER.info("Starting Miroa launcher...");
         SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
         MiroaLauncher.LOGGER.info("Local time is ".concat(sdf.format(Calendar.getInstance().getTime())));
+        MiroaLauncher.LOGGER.info("Launcher info\n".concat(GitInfo.getInstance().toString()));
 
         FXMLLoader loader = new FXMLLoader(this.getClass().getResource("main.fxml"));
         AnchorPane root = loader.load();

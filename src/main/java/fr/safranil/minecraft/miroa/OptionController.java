@@ -22,6 +22,7 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -45,11 +46,15 @@ public class OptionController {
     TextField javaField;
     @FXML
     Button logoutButton;
+    @FXML
+    Label version;
 
     @FXML
     public void initialize() {
         MiroaLauncher.LOGGER.info("Initializing option controller");
         MiroaLauncher launcher = MiroaLauncher.getInstance();
+
+        version.setText(GitInfo.getInstance().getDescribe());
 
         memoryChoice.setItems(FXCollections.observableArrayList(MiroaLauncher.memoryOptions));
 
