@@ -128,14 +128,13 @@ public class MainController {
                         PlatformImpl.runAndWait(() -> setToPlay());
                         MiroaLauncher.LOGGER.info("User ".concat(launcher.getUsername()).concat(" is now authenticated"));
                     } catch (Exception e) {
+                        PlatformImpl.runAndWait(() -> setToLogin());
                         MiroaLauncher.LOGGER.warning("Exception thrown when authenticating : ".concat(e.getMessage()));
                         e.printStackTrace();
                         Utils.displayError("Erreur lors de l'authentification", "ErrorMessage : ".concat(e.getMessage()));
                     }
 
                     PlatformImpl.runAndWait(() -> {
-                        playButton.setDisable(false);
-                        optionsButton.setDisable(false);
                         progress.setVisible(false);
                         infoLabel.setText("");
                         loginPane.setOpacity(1);
