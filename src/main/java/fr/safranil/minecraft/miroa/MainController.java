@@ -65,6 +65,9 @@ public class MainController {
     ProgressIndicator progress;
 
     @FXML
+    Label playerCount;
+
+    @FXML
     GridPane loginPane;
     @FXML
     GridPane infoPane;
