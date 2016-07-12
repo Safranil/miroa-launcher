@@ -55,7 +55,7 @@ class MiroaLauncher {
     static final String FORGE_VERSION = "1.7.10-Forge10.13.4.1614-1.7.10";
 
     private static final String DEFAULT_JAVA = getDefaultJava();
-    static final String SERVER_IP = "mc.safranil.fr";
+    static final String SERVER_HOST = "mc.safranil.fr";
     static final int SERVER_PORT = 25565;
 
     MainController mainController;

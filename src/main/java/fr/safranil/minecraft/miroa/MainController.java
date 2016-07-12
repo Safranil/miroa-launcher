@@ -299,7 +299,7 @@ public class MainController {
             ServerInfo[] servers;
 
             for (ServerInfo server : savedServers) {
-                if (Objects.equals(server.getIP(), MiroaLauncher.SERVER_IP) && server.getPort() == MiroaLauncher.SERVER_PORT) {
+                if (Objects.equals(server.getIP(), MiroaLauncher.SERVER_HOST) && server.getPort() == MiroaLauncher.SERVER_PORT) {
                     MiroaLauncher.LOGGER.info("Server already exist");
                     return;
                 }
@@ -307,7 +307,7 @@ public class MainController {
 
             MiroaLauncher.LOGGER.info("Adding Miroa server");
             servers = new ServerInfo[savedServers.length + 1];
-            servers[0] = new ServerInfo(MiroaLauncher.SERVER_IP, "Miroa", null, MiroaLauncher.SERVER_PORT);
+            servers[0] = new ServerInfo(MiroaLauncher.SERVER_HOST, "Miroa", null, MiroaLauncher.SERVER_PORT);
             System.arraycopy(savedServers, 0, servers, 1, savedServers.length);
             serverStorage.saveServers(servers);
         } catch (Exception e) {
