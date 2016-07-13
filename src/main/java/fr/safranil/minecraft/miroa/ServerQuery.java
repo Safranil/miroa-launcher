@@ -104,6 +104,7 @@ class ServerQuery {
             dis.readFully(bytesIn);
             String json = new String(bytesIn);
 
+            MiroaLauncher.LOGGER.info(json);
             MiroaLauncher.LOGGER.info("Getting players count on the main server");
             JSONObject tmpJSON = (JSONObject) JSONValue.parse(json);
             if (tmpJSON.containsKey("players")) {
@@ -111,8 +112,8 @@ class ServerQuery {
                 if (tmpJSON.containsKey("max")) {
                     max = (int) tmpJSON.get("max");
                 }
-                if (tmpJSON.containsKey("count")) {
-                    count = (int) tmpJSON.get("count");
+                if (tmpJSON.containsKey("online")) {
+                    count = (int) tmpJSON.get("online");
                 }
             }
             MiroaLauncher.LOGGER.info("Found players count : " + count + "/" + max);
