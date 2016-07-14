@@ -236,6 +236,7 @@ public class MainController {
                                 progress.setProgress(1);
                             });
 
+                            Main.cron.interrupt();
                             Thread.sleep(3000);
                             PlatformImpl.runAndWait(() -> {
                                 Main.mainStage.hide();

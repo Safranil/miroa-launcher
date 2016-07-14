@@ -76,10 +76,6 @@ class Starter extends Thread {
                 PlatformImpl.runLater(() -> launcher.mainController.loginField.setText(username));
             }
 
-            ServerQuery serverQuery = new ServerQuery();
-            serverQuery.getPlayerCount();
-            PlatformImpl.runLater(() -> launcher.mainController.playerCount.setText(serverQuery.getCount() + "/" + serverQuery.getMax()));
-
             PlatformImpl.runLater(() -> launcher.mainController.loading.setVisible(false));
         } catch (Exception e) {
             MiroaLauncher.LOGGER.info("Unable to start the launcher");

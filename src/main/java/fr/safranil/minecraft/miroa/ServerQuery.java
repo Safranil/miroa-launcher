@@ -104,7 +104,6 @@ class ServerQuery {
             dis.readFully(bytesIn);
             String json = new String(bytesIn);
 
-            MiroaLauncher.LOGGER.info(json);
             MiroaLauncher.LOGGER.info("Getting players count on the main server");
             JSONObject tmpJSON = (JSONObject) JSONValue.parse(json);
             if (tmpJSON.containsKey("players")) {

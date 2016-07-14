@@ -33,6 +33,7 @@ public class Main extends Application {
     static Scene mainScene;
     static Stage mainStage;
     static HostServices hostServices;
+    static Thread cron;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -71,8 +72,11 @@ public class Main extends Application {
 
         // Do some work in a separate thread
         MiroaLauncher.LOGGER.info("Running Starter thread...");
-        Thread t = new Starter();
-        t.start();
+        Thread starter = new Starter();
+        starter.start();
+
+        cron = new CronThread();
+        cron.start();
     }
 
     public static void main(String[] args) {
