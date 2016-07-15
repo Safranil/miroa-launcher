@@ -6,7 +6,7 @@
 
     <groupId>safranil</groupId>
     <artifactId>miroa-launcher</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.2</version>
 
     <repositories>
         <!--<repository>-->
