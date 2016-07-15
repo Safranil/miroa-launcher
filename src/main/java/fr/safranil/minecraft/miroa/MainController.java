@@ -350,6 +350,17 @@ public class MainController {
             stage.setScene(new Scene(root));
             MiroaLauncher.LOGGER.info("Showing options GUI");
             stage.show();
+
+            double oHeight = stage.getHeight();
+            double oWidth  = stage.getWidth();
+            double mHeigth = Main.mainStage.getHeight();
+            double mWidth  = Main.mainStage.getWidth();
+            double xPos = Main.mainStage.getX();
+            double yPos = Main.mainStage.getY();
+
+            stage.setX(xPos + (mWidth/2.0) - (oWidth/2.0));
+            stage.setY(yPos + (mHeigth/2.0) - (oHeight/2.0));
+
         } catch (IOException e) {
             MiroaLauncher.LOGGER.severe("Unable to show Option GUI");
             e.printStackTrace();
