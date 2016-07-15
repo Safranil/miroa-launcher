@@ -1,24 +1,27 @@
 /**
  * This file is part of Miroa Launcher.
  * Copyright (C) 2016 David Cachau <dev@safranil.fr>
- *
+ * <p>
  * Miroa Launcher is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * any later version.
- *
+ * <p>
  * Miroa Launcher is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Miroa Launcher.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.safranil.minecraft.miroa;
 
+import com.sun.javafx.application.PlatformImpl;
+import fr.safranil.minecraft.mclauncherapi.InstallProgressMonitor;
 import javafx.application.HostServices;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -79,22 +82,64 @@ public class OptionController {
     }
 
     @FXML
-    public void openWebsite () {
+    public void openWebsite() {
         Main.hostServices.showDocument("http://minecraft.safranil.fr/");
     }
 
     @FXML
-    public void openLog () {
+    public void openLog() {
         Main.hostServices.showDocument((new File(MiroaLauncher.OS.getWorkingDirectory(), "logs")).getAbsolutePath());
     }
 
     @FXML
-    public void openLauncherDir () {
+    public void openLauncherDir() {
         Main.hostServices.showDocument(MiroaLauncher.OS.getWorkingDirectory().getAbsolutePath());
     }
 
     @FXML
-    public void removeLog () {
+    public void checkLocalFiles() {
+        MiroaLauncher.LOGGER.info("Checking local files");
+        closeAction();
+        Thread t = new Thread(new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                MiroaLauncher launcher = MiroaLauncher.getInstance();
+                try {
+                    PlatformImpl.runAndWait(() -> {
+                        launcher.mainController.playButton.setDisable(true);
+                        launcher.mainController.optionsButton.setDisable(true);
+                        launcher.mainController.loginPane.setOpacity(0.25);
+                        launcher.mainController.face.setOpacity(0.25);
+                        launcher.mainController.infoPane.setVisible(true);
+                        launcher.mainController.infoLabel.setText("Vérification des fichiers...");
+                        launcher.mainController.subInfoLabel.setText("");
+                        launcher.mainController.progress.setStyle("-fx-progress-color: #ffd700;");
+                        launcher.mainController.progress.setProgress(-1);
+                    });
+                    Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(launcher.mainController.progress, launcher.mainController.subInfoLabel), true);
+                    PlatformImpl.runAndWait(() -> {
+                        launcher.mainController.infoPane.setVisible(false);
+                        launcher.mainController.playButton.setDisable(false);
+                        launcher.mainController.optionsButton.setDisable(false);
+                        launcher.mainController.progress.setVisible(false);
+                        launcher.mainController.infoLabel.setText("");
+                        launcher.mainController.subInfoLabel.setText("");
+                        launcher.mainController.loginPane.setOpacity(1);
+                        launcher.mainController.face.setOpacity(1);
+                    });
+                } catch (Exception e) {
+                    MiroaLauncher.LOGGER.severe("Error when downloading updates");
+                    e.printStackTrace();
+                    Utils.displayException("Erreur lors de la vérification", "Une erreur c'est produite lors de la vérification des fichiers du jeu.", e);
+                }
+                return null;
+            }
+        });
+        t.start();
+    }
+
+    @FXML
+    public void removeLog() {
         try {
             FileUtils.deleteDirectory(new File(MiroaLauncher.OS.getWorkingDirectory(), "logs"));
         } catch (IOException e) {
@@ -105,8 +150,8 @@ public class OptionController {
     }
 
     @FXML
-    public void removeLauncher () {
-        for(File file : MiroaLauncher.OS.getWorkingDirectory().listFiles()) {
+    public void removeLauncher() {
+        for (File file : MiroaLauncher.OS.getWorkingDirectory().listFiles()) {
             String name = file.getName();
             if (!name.equals("saves") &&
                     !name.equals("launcher_profiles.json") &&
@@ -134,13 +179,12 @@ public class OptionController {
 
             MiroaLauncher.LOGGER.info("Options saved");
             closeAction();
-        }
-        else {
+        } else {
             MiroaLauncher.LOGGER.info("Invalid options, not saved");
             Utils.displayError("Erreur chemin vers Java",
                     "L'exécutable Java spécifié est introuvable ou n'est pas exécutable.",
                     "Vérifiez que vous avez spécifier le bon chemin de Java, par exemple :\n" +
-                        "C:\\Program Files\\Java\\jre1.8.0_92\\bin\\java.exe");
+                            "C:\\Program Files\\Java\\jre1.8.0_92\\bin\\java.exe");
         }
     }
 

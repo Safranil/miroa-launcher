@@ -37,13 +37,24 @@ class Updater {
     private static Logger log = Logger.getLogger(Updater.class.getName());
 
     /**
-     * Update custom files
+     * Update custom files without checking localfile
      *
      * @param minecraft Launcher working directory
      * @param progress Progress monitor
      * @throws Exception
      */
     static void update(File minecraft, IProgressMonitor progress) throws Exception {
+        update(minecraft, progress, false);
+    }
+
+    /**
+     * Update custom files
+     *
+     * @param minecraft Launcher working directory
+     * @param progress Progress monitor
+     * @throws Exception
+     */
+    static void update(File minecraft, IProgressMonitor progress, boolean checkLocal) throws Exception {
         String serverUrl = "http://static.safranil.fr/minecraft/update.json";
 
         // Download package information from the server
@@ -77,7 +88,7 @@ class Updater {
             fileToDownload = (JSONArray) updateJson.get("files");
         } else {
             log.info("Rule : Delta calculation");
-            calculateDelta((JSONArray) localJson.get("files"), (JSONArray) updateJson.get("files"), fileToDelete, fileToDownload, minecraft);
+            calculateDelta((JSONArray) localJson.get("files"), (JSONArray) updateJson.get("files"), fileToDelete, fileToDownload, minecraft, checkLocal);
         }
 
         File tempDir = new File(minecraft, "tmpdl");
@@ -85,7 +96,7 @@ class Updater {
             FileUtils.forceMkdir(tempDir);
         }
 
-        log.info("Downloading files...");
+        if (fileToDownload.size() > 0) log.info("Downloading files...");
         for (Object aFileToDownload : fileToDownload) {
             JSONObject json = (JSONObject) aFileToDownload;
             String file = (String) json.get("name");
@@ -190,7 +201,7 @@ class Updater {
      * @param fileToDelete all file to delete array
      * @param fileToDownload all file to download array
      */
-    private static void calculateDelta(JSONArray local, JSONArray update, JSONArray fileToDelete, JSONArray fileToDownload, File ws) {
+    private static void calculateDelta(JSONArray local, JSONArray update, JSONArray fileToDelete, JSONArray fileToDownload, File ws, boolean checkLocalFiles) {
         JSONObject lJson, uJson;
         String lStr, uStr, fStr;
         FileInputStream fis;
@@ -210,28 +221,29 @@ class Updater {
                 if (lStr.equals(uStr)) {
                     fis = null;
                     fStr = "";
-                    // Get the local file hash
-                    try {
-                        fis = new FileInputStream(new File(ws, lStr));
-                        fStr = DigestUtils.sha1Hex(fis);
-                    } catch (FileNotFoundException ignored) {
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    finally {
-                        if (fis != null)
-                            try {
-                                fis.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                    if (checkLocalFiles) {
+                        // Get the local file hash
+                        try {
+                            fis = new FileInputStream(new File(ws, lStr));
+                            fStr = DigestUtils.sha1Hex(fis);
+                        } catch (FileNotFoundException ignored) {
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (fis != null)
+                                try {
+                                    fis.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                        }
                     }
 
                     lStr = (String) ((JSONObject) local.get(i)).get("checksum");
                     uStr = (String) ((JSONObject) update.get(j)).get("checksum");
 
                     // If hashes are incorrect, download the file and remove the local file
-                    if (!lStr.equals(uStr) || !lStr.equals(fStr)) {
+                    if (!lStr.equals(uStr) || (checkLocalFiles && !lStr.equals(fStr))) {
                         fileToDelete.add(lJson);
                         fileToDownload.add(uJson);
                     }
