@@ -27,6 +27,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.io.FileUtils;
@@ -37,6 +38,8 @@ import java.io.IOException;
 import java.net.URI;
 
 public class OptionController {
+    @FXML
+    Pane mainPane;
     @FXML
     Button saveButton;
     @FXML
@@ -99,13 +102,14 @@ public class OptionController {
     @FXML
     public void checkLocalFiles() {
         MiroaLauncher.LOGGER.info("Checking local files");
-        closeAction();
+        //closeAction();
         Thread t = new Thread(new Task<Void>() {
             @Override
             protected Void call() throws Exception {
                 MiroaLauncher launcher = MiroaLauncher.getInstance();
                 try {
                     PlatformImpl.runAndWait(() -> {
+                        mainPane.setDisable(true);
                         launcher.mainController.playButton.setDisable(true);
                         launcher.mainController.optionsButton.setDisable(true);
                         launcher.mainController.loginPane.setOpacity(0.25);
@@ -118,6 +122,7 @@ public class OptionController {
                     });
                     Updater.update(MiroaLauncher.OS.getWorkingDirectory(), new InstallProgressMonitor(launcher.mainController.progress, launcher.mainController.subInfoLabel), true);
                     PlatformImpl.runAndWait(() -> {
+                        mainPane.setDisable(false);
                         launcher.mainController.infoPane.setVisible(false);
                         launcher.mainController.playButton.setDisable(false);
                         launcher.mainController.optionsButton.setDisable(false);
