@@ -35,7 +35,7 @@ public class LaunchSettings implements ILaunchSettings {
 
     @Override
     public String getInitHeap() {
-        return "512M";
+        return null;
     }
 
     @Override
@@ -65,9 +65,11 @@ public class LaunchSettings implements ILaunchSettings {
 
     @Override
     public List<String> getJavaArguments() {
+        int cores = Runtime.getRuntime().availableProcessors();
         return Arrays
-                .asList("-XX:+UseConcMarkSweepGC",
-                        "-XX:-UseAdaptiveSizePolicy",
-                        "-Xmn128M");
+                .asList("-XX:+UseG1GC",
+                        "-XX:ConcGCThreads="+cores/4,
+                        "-XX:+AggressiveOpts",
+                        "-XX:ParallelGCThreads="+cores);
     }
 }
